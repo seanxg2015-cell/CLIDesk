@@ -322,6 +322,21 @@ export async function registerIpc(mainWindow: BrowserWindow, app: Electron.App) 
     return configManager.get(key)
   })
 
+  // Admin config
+  ipcMain.handle(IpcChannel.Config_GetAdmin, async () => {
+    const fs = await import('node:fs/promises')
+    const path = await import('node:path')
+    const { app } = await import('electron')
+
+    const configPath = path.join(app.getAppPath(), 'config', 'admin-config.json')
+    try {
+      const content = await fs.readFile(configPath, 'utf-8')
+      return JSON.parse(content)
+    } catch {
+      return { adminUsers: [], organizationName: '我的团队' }
+    }
+  })
+
   // theme
   ipcMain.handle(IpcChannel.App_SetTheme, (_, theme: ThemeMode) => {
     themeService.setTheme(theme)

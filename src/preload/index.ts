@@ -378,7 +378,8 @@ const api = {
   config: {
     set: (key: string, value: any, isNotify: boolean = false) =>
       ipcRenderer.invoke(IpcChannel.Config_Set, key, value, isNotify),
-    get: (key: string) => ipcRenderer.invoke(IpcChannel.Config_Get, key)
+    get: (key: string) => ipcRenderer.invoke(IpcChannel.Config_Get, key),
+    getAdmin: () => ipcRenderer.invoke(IpcChannel.Config_GetAdmin)
   },
   miniWindow: {
     show: () => ipcRenderer.invoke(IpcChannel.MiniWindow_Show),

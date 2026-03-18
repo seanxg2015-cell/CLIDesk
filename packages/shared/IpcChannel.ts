@@ -71,6 +71,7 @@ export enum IpcChannel {
 
   Config_Set = 'config:set',
   Config_Get = 'config:get',
+  Config_GetAdmin = 'config:get-admin',
 
   MiniWindow_Show = 'miniwindow:show',
   MiniWindow_Hide = 'miniwindow:hide',

@@ -44,7 +44,7 @@ import paintings from './paintings'
 import preprocess from './preprocess'
 import runtime from './runtime'
 import selectionStore from './selectionStore'
-import settings from './settings'
+import settings, { setAdminConfig, setIsAdmin } from './settings'
 import shortcuts from './shortcuts'
 import tabs from './tabs'
 import toolPermissions from './toolPermissions'
@@ -124,7 +124,7 @@ const store = configureStore({
 export type RootState = ReturnType<typeof rootReducer>
 export type AppDispatch = typeof store.dispatch
 
-export const persistor = persistStore(store, undefined, () => {
+export const persistor = persistStore(store, undefined, async () => {
   // Initialize notes path after rehydration if empty
   const state = store.getState()
   if (!state.note.notesPath) {
@@ -138,6 +138,19 @@ export const persistor = persistStore(store, undefined, () => {
         logger.error('Failed to initialize notes path on startup:', error as Error)
       }
     }, 0)
+  }
+
+  // Initialize admin config
+  try {
+    const adminConfig = await window.api.config.getAdmin()
+    store.dispatch(setAdminConfig(adminConfig))
+
+    // Check if current user is admin
+    const isAdmin = adminConfig.adminUsers?.includes(state.settings.userId) ?? false
+    store.dispatch(setIsAdmin(isAdmin))
+    logger.info('Admin config loaded, isAdmin:', isAdmin)
+  } catch (error) {
+    logger.error('Failed to load admin config:', error as Error)
   }
 
   // Notify main process that Redux store is ready

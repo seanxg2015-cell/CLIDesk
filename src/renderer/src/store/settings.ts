@@ -59,6 +59,13 @@ export type UserTheme = {
 }
 
 export interface SettingsState {
+  // Admin config
+  isAdmin: boolean
+  adminConfig: {
+    organizationName: string
+    adminUsers: string[]
+  }
+  // Existing fields
   showAssistants: boolean
   showTopics: boolean
   assistantsTabSortType: AssistantsSortType
@@ -253,6 +260,13 @@ export interface SettingsState {
 export type MultiModelMessageStyle = 'horizontal' | 'vertical' | 'fold' | 'grid'
 
 export const initialState: SettingsState = {
+  // Admin config
+  isAdmin: false,
+  adminConfig: {
+    organizationName: '',
+    adminUsers: []
+  },
+  // Existing fields
   showAssistants: true,
   showTopics: true,
   assistantsTabSortType: 'list',
@@ -456,6 +470,14 @@ const settingsSlice = createSlice({
   name: 'settings',
   initialState,
   reducers: {
+    // Admin config reducers
+    setAdminConfig: (state, action: PayloadAction<{ organizationName: string; adminUsers: string[] }>) => {
+      state.adminConfig = action.payload
+    },
+    setIsAdmin: (state, action: PayloadAction<boolean>) => {
+      state.isAdmin = action.payload
+    },
+    // Existing reducers
     setShowAssistants: (state, action: PayloadAction<boolean>) => {
       state.showAssistants = action.payload
     },
@@ -904,6 +926,10 @@ const settingsSlice = createSlice({
 })
 
 export const {
+  // Admin config actions
+  setAdminConfig,
+  setIsAdmin,
+  // Existing actions
   setShowModelNameInMarkdown,
   setShowModelProviderInMarkdown,
   setShowAssistants,
