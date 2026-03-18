@@ -85,7 +85,18 @@ interface SettingsState {
 
 - [ ] **Step 3: 加载配置时检查管理员身份**
 
-在 settings 初始化逻辑中添加：从 `admin-config.json` 读取并设置 `isAdmin`
+在 `src/renderer/src/store/settings.ts` 的初始化逻辑中添加：
+
+```typescript
+// 在 settingsSlice.reducer 中添加 extraReducers 或初始化时
+const adminConfig = await window.api.invoke('config:getAdminConfig');
+if (adminConfig?.adminUsers?.includes(settings.userId)) {
+  state.isAdmin = true;
+  state.adminConfig = adminConfig;
+}
+```
+
+如果 settings slice 使用 `createAsyncThunk` 加载配置，在 `loadSettings` thunk 中添加检查逻辑。
 
 - [ ] **Step 4: 提交**
 
@@ -232,29 +243,47 @@ const isAdmin = useSelector((s: RootState) => s.settings.isAdmin);
 </Route>
 ```
 
-- [ ] **Step 3: 创建基础管理后台布局**
+- [ ] **Step 3: 创建管理后台布局组件**
+
+创建文件 `src/renderer/src/pages/admin/AdminLayout.tsx`:
 
 ```tsx
 // src/renderer/src/pages/admin/AdminLayout.tsx
+import { Layout, Menu } from 'antd';
+import { Link, Outlet, Navigate } from 'react-router-dom';
+import { useSelector } from 'react-redux';
+import { RootState } from '@/store';
+import { SettingOutlined, RobotOutlined, ThunderboltOutlined, UserOutlined } from '@ant-design/icons';
+
+const { Sider, Content } = Layout;
+
 export const AdminLayout = () => {
   const isAdmin = useSelector((s: RootState) => s.settings.isAdmin);
-  
+
   if (!isAdmin) {
     return <Navigate to="/" replace />;
   }
 
   return (
-    <Layout>
-      <Sider>
-        <Menu>
-          <Menu.Item key="agents"><Link to="/admin/agents">公共 Agent</Link></Menu.Item>
-          <Menu.Item key="skills"><Link to="/admin/skills">公共 Skill</Link></Menu.Item>
-          <Menu.Item key="users"><Link to="/admin/users">用户管理</Link></Menu.Item>
+    <Layout style={{ minHeight: '100vh' }}>
+      <Sider width={200}>
+        <Menu mode="inline" style={{ height: '100%' }}>
+          <Menu.Item key="agents" icon={<RobotOutlined />}>
+            <Link to="/admin/agents">公共 Agent</Link>
+          </Menu.Item>
+          <Menu.Item key="skills" icon={<ThunderboltOutlined />}>
+            <Link to="/admin/skills">公共 Skill</Link>
+          </Menu.Item>
+          <Menu.Item key="users" icon={<UserOutlined />}>
+            <Link to="/admin/users">用户管理</Link>
+          </Menu.Item>
         </Menu>
       </Sider>
-      <Content>
-        <Outlet />
-      </Content>
+      <Layout style={{ padding: '24px' }}>
+        <Content>
+          <Outlet />
+        </Content>
+      </Layout>
     </Layout>
   );
 };
@@ -370,7 +399,7 @@ export const AgentForm = ({ open, onClose, onSave, initialValues }: Props) => {
 };
 ```
 
-- [ ] **Step 3: 创建主页面**
+- [ ] **Step 3: 创建主页面并连接表单**
 
 ```tsx
 // src/renderer/src/pages/settings/AdminAgentSettings/index.tsx
@@ -380,15 +409,49 @@ import { AgentForm } from './AgentForm';
 
 export const AdminAgentSettings = () => {
   const [formOpen, setFormOpen] = useState(false);
+  const [editingAgent, setEditingAgent] = useState<any>(null);
+
+  const handleSave = async (values: any) => {
+    if (editingAgent) {
+      await window.api.agent.update(editingAgent.id, values);
+    } else {
+      await window.api.agent.create(values);
+    }
+    setFormOpen(false);
+    setEditingAgent(null);
+    // 刷新列表
+  };
+
+  const handleEdit = (agent: any) => {
+    setEditingAgent(agent);
+    setFormOpen(true);
+  };
 
   return (
     <div>
       <h2>公共 Agent 管理</h2>
-      <AgentList />
-      <AgentForm open={formOpen} onClose={() => setFormOpen(false)} onSave={() => {}} />
+      <AgentList onEdit={handleEdit} />
+      <AgentForm 
+        open={formOpen} 
+        onClose={() => { setFormOpen(false); setEditingAgent(null); }} 
+        onSave={handleSave}
+        initialValues={editingAgent}
+      />
     </div>
   );
 };
+```
+
+同时更新 AgentList，添加 onEdit 回调：
+
+```tsx
+// AgentList.tsx
+interface Props {
+  onEdit: (agent: Agent) => void;
+}
+
+// 在 columns 中:
+<Button size="small" onClick={() => onEdit(record)}>编辑</Button>
 ```
 
 - [ ] **Step 4: 在路由中注册**
@@ -453,17 +516,42 @@ router.post('/', async (ctx) => {
 
 - [ ] **Step 4: 在 preload 中暴露 API**
 
+查看现有 `src/preload/index.ts` 中的 `window.api` 定义，将其扩展为：
+
 ```typescript
 // src/preload/index.ts
+// 找到现有的 window.api 定义，在其内部添加 agent 和 skill
+
 window.api = {
-  // ... existing
+  // ... existing content (keep this)
+  
+  // 新增 agent API
   agent: {
     list: () => ipcRenderer.invoke('agent:list'),
-    create: (data) => ipcRenderer.invoke('agent:create', data),
-    update: (id, data) => ipcRenderer.invoke('agent:update', id, data),
+    listPublic: () => ipcRenderer.invoke('agent:listPublic'),
+    get: (id: string) => ipcRenderer.invoke('agent:get', id),
+    create: (data: any) => ipcRenderer.invoke('agent:create', data),
+    update: (id: string, data: any) => ipcRenderer.invoke('agent:update', id, data),
+    delete: (id: string) => ipcRenderer.invoke('agent:delete', id),
+  },
+  
+  // 新增 skill API
+  skill: {
+    listAll: () => ipcRenderer.invoke('skill:listAll'),
+    listPublic: () => ipcRenderer.invoke('skill:listPublic'),
+    listUser: () => ipcRenderer.invoke('skill:listUser'),
+    getUserSelected: (userId: string) => ipcRenderer.invoke('skill:getUserSelected', userId),
+    setUserSelected: (userId: string, skillIds: string[]) => ipcRenderer.invoke('skill:setUserSelected', userId, skillIds),
+    create: (data: any) => ipcRenderer.invoke('skill:create', data),
+    update: (id: string, data: any) => ipcRenderer.invoke('skill:update', id, data),
+    delete: (id: string) => ipcRenderer.invoke('skill:delete', id),
+  },
+  
+  // 新增 config API
+  config: {
+    getAdminConfig: () => ipcRenderer.invoke('config:getAdminConfig'),
   },
 };
-```
 
 - [ ] **Step 5: 提交**
 
@@ -538,7 +626,7 @@ git commit -m "feat: add skill database schema"
 // src/main/services/agent-workbench/SkillService.ts
 import { db } from '../agents/database';
 import { skills, userSelectedSkills } from './schema/skills.schema';
-import { eq, and } from 'drizzle-orm';
+import { eq, and, inArray } from 'drizzle-orm';
 
 export interface CreateSkillDTO {
   name: string;
@@ -555,6 +643,10 @@ export interface CreateSkillDTO {
 }
 
 export class SkillService {
+  async listAllSkills() {
+    return db.select().from(skills);
+  }
+
   async listPublicSkills() {
     return db.select().from(skills).where(eq(skills.isPublic, true));
   }
@@ -586,7 +678,8 @@ export class SkillService {
     const selected = await db.select().from(userSelectedSkills)
       .where(eq(userSelectedSkills.userId, userId));
     const skillIds = selected.map(s => s.skillId);
-    return db.select().from(skills).where(/* skill.id in skillIds */);
+    if (skillIds.length === 0) return [];
+    return db.select().from(skills).where(inArray(skills.id, skillIds));
   }
 
   async setUserSelectedSkills(userId: string, skillIds: string[]) {
@@ -602,11 +695,11 @@ export class SkillService {
 export const skillService = new SkillService();
 ```
 
-- [ ] **Step 2: 提交**
+- [ ] **Step 4: 提交**
 
 ```bash
-git add src/main/services/agent-workbench/SkillService.ts
-git commit -m "feat: add SkillService"
+git add src/main/apiServer/routes/skills.ts src/main/apiServer/index.ts src/main/services/agent-workbench/SkillService.ts
+git commit -m "feat: add skill API routes"
 ```
 
 ---
@@ -634,12 +727,16 @@ interface Skill {
   isPublic: boolean;
 }
 
-export const SkillList = () => {
+interface Props {
+  onEdit: (skill: Skill) => void;
+}
+
+export const SkillList = ({ onEdit }: Props) => {
   const [skills, setSkills] = useState<Skill[]>([]);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    window.api.invoke('skill:listPublic').then(setSkills).finally(() => setLoading(false));
+    window.api.invoke('skill:listAll').then(setSkills).finally(() => setLoading(false));
   }, []);
 
   const columns = [
@@ -651,7 +748,7 @@ export const SkillList = () => {
       title: '操作',
       render: (_: any, record: Skill) => (
         <Space>
-          <Button size="small">编辑</Button>
+          <Button size="small" onClick={() => onEdit(record)}>编辑</Button>
           <Button size="small" danger>删除</Button>
         </Space>
       ),
@@ -726,7 +823,7 @@ export const SkillForm = ({ open, onClose, onSave, initialValues }: Props) => {
 };
 ```
 
-- [ ] **Step 3: 创建主页面**
+- [ ] **Step 3: 创建主页面并连接表单**
 
 ```tsx
 // src/renderer/src/pages/settings/AdminSkillSettings/index.tsx
@@ -736,12 +833,37 @@ import { useState } from 'react';
 
 export const AdminSkillSettings = () => {
   const [formOpen, setFormOpen] = useState(false);
+  const [editingSkill, setEditingSkill] = useState<any>(null);
+
+  const handleSave = async (values: any) => {
+    // 处理 triggerConfig.autoKeywords 字符串转数组
+    const data = {
+      ...values,
+      triggerConfig: {
+        manual: values.triggerConfig?.manual ?? true,
+        autoKeywords: values.triggerConfig?.autoKeywords?.split(',').map(s => s.trim()).filter(Boolean) ?? [],
+      },
+    };
+    
+    if (editingSkill) {
+      await window.api.skill.update(editingSkill.id, data);
+    } else {
+      await window.api.skill.create(data);
+    }
+    setFormOpen(false);
+    setEditingSkill(null);
+  };
 
   return (
     <div>
       <h2>公共 Skill 管理</h2>
-      <SkillList />
-      <SkillForm open={formOpen} onClose={() => setFormOpen(false)} onSave={() => {}} />
+      <SkillList onEdit={(skill) => { setEditingSkill(skill); setFormOpen(true); }} />
+      <SkillForm 
+        open={formOpen} 
+        onClose={() => { setFormOpen(false); setEditingSkill(null); }} 
+        onSave={handleSave}
+        initialValues={editingSkill}
+      />
     </div>
   );
 };
