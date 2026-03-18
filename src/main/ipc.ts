@@ -39,6 +39,7 @@ import { BrowserWindow, dialog, ipcMain, session, shell, systemPreferences, webC
 import fontList from 'font-list'
 
 import { agentMessageRepository } from './services/agents/database'
+import { agentService } from './services/agents/services'
 import { PluginService } from './services/agents/plugins/PluginService'
 import { analyticsService } from './services/AnalyticsService'
 import { apiServerService } from './services/ApiServerService'
@@ -307,7 +308,12 @@ export async function registerIpc(mainWindow: BrowserWindow, app: Electron.App) 
       const database = await agentService.getDatabase()
       const now = new Date().toISOString()
 
-      const serializedUpdates = agentService.serializeJsonFields(updates)
+      const serializedUpdates: Record<string, any> = {}
+      for (const [key, value] of Object.entries(updates)) {
+        if (value !== undefined) {
+          serializedUpdates[key] = Array.isArray(value) || typeof value === 'object' ? JSON.stringify(value) : value
+        }
+      }
       await database
         .update(agentsTable)
         .set({ ...serializedUpdates, updated_at: now })
@@ -329,6 +335,92 @@ export async function registerIpc(mainWindow: BrowserWindow, app: Electron.App) 
       return { success: true }
     } catch (error) {
       logger.error('Failed to delete agent', error as Error)
+      throw error
+    }
+  })
+
+  // Skill Admin handlers
+  ipcMain.handle(IpcChannel.SkillAdmin_ListPublic, async () => {
+    try {
+      const { skillService } = await import('@main/services/agent-workbench/SkillService')
+      return await skillService.listPublicSkills()
+    } catch (error) {
+      logger.error('Failed to list public skills', error as Error)
+      throw error
+    }
+  })
+
+  ipcMain.handle(IpcChannel.SkillAdmin_Create, async (_event, data) => {
+    try {
+      const { skillService } = await import('@main/services/agent-workbench/SkillService')
+      return await skillService.createSkill(data)
+    } catch (error) {
+      logger.error('Failed to create skill', error as Error)
+      throw error
+    }
+  })
+
+  ipcMain.handle(IpcChannel.SkillAdmin_Update, async (_event, id, updates) => {
+    try {
+      const { skillService } = await import('@main/services/agent-workbench/SkillService')
+      return await skillService.updateSkill(id, updates)
+    } catch (error) {
+      logger.error('Failed to update skill', error as Error)
+      throw error
+    }
+  })
+
+  ipcMain.handle(IpcChannel.SkillAdmin_Delete, async (_event, id) => {
+    try {
+      const { skillService } = await import('@main/services/agent-workbench/SkillService')
+      await skillService.deleteSkill(id)
+      return { success: true }
+    } catch (error) {
+      logger.error('Failed to delete skill', error as Error)
+      throw error
+    }
+  })
+
+  // Skill User handlers
+  ipcMain.handle(IpcChannel.SkillUser_ListSelected, async (_event, userId: string) => {
+    try {
+      const { skillService } = await import('@main/services/agent-workbench/SkillService')
+      return await skillService.listUserSelectedSkills(userId)
+    } catch (error) {
+      logger.error('Failed to list user selected skills', error as Error)
+      throw error
+    }
+  })
+
+  ipcMain.handle(IpcChannel.SkillUser_Select, async (_event, userId: string, skillId: string) => {
+    try {
+      const { skillService } = await import('@main/services/agent-workbench/SkillService')
+      await skillService.selectSkill(userId, skillId)
+      return { success: true }
+    } catch (error) {
+      logger.error('Failed to select skill', error as Error)
+      throw error
+    }
+  })
+
+  ipcMain.handle(IpcChannel.SkillUser_Deselect, async (_event, userId: string, skillId: string) => {
+    try {
+      const { skillService } = await import('@main/services/agent-workbench/SkillService')
+      await skillService.deselectSkill(userId, skillId)
+      return { success: true }
+    } catch (error) {
+      logger.error('Failed to deselect skill', error as Error)
+      throw error
+    }
+  })
+
+  ipcMain.handle(IpcChannel.SkillUser_Toggle, async (_event, userId: string, skillId: string, enabled: boolean) => {
+    try {
+      const { skillService } = await import('@main/services/agent-workbench/SkillService')
+      await skillService.toggleSkill(userId, skillId, enabled)
+      return { success: true }
+    } catch (error) {
+      logger.error('Failed to toggle skill', error as Error)
       throw error
     }
   })
