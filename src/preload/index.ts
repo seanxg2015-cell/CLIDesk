@@ -718,7 +718,8 @@ const api = {
     select: (userId: string, skillId: string) => ipcRenderer.invoke(IpcChannel.SkillUser_Select, userId, skillId),
     deselect: (userId: string, skillId: string) => ipcRenderer.invoke(IpcChannel.SkillUser_Deselect, userId, skillId),
     toggle: (userId: string, skillId: string, enabled: boolean) =>
-      ipcRenderer.invoke(IpcChannel.SkillUser_Toggle, userId, skillId, enabled)
+      ipcRenderer.invoke(IpcChannel.SkillUser_Toggle, userId, skillId, enabled),
+    getInstructions: (userId: string) => ipcRenderer.invoke(IpcChannel.SkillUser_GetInstructions, userId)
   }
 }
 

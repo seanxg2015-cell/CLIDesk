@@ -129,6 +129,7 @@ export enum IpcChannel {
   SkillUser_Select = 'skill-user:select',
   SkillUser_Deselect = 'skill-user:deselect',
   SkillUser_Toggle = 'skill-user:toggle',
+  SkillUser_GetInstructions = 'skill-user:get-instructions',
 
   //copilot
   Copilot_GetAuthMessage = 'copilot:get-auth-message',

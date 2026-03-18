@@ -425,6 +425,21 @@ export async function registerIpc(mainWindow: BrowserWindow, app: Electron.App) 
     }
   })
 
+  ipcMain.handle(IpcChannel.SkillUser_GetInstructions, async (_event, userId: string) => {
+    try {
+      const { skillService } = await import('@main/services/agent-workbench/SkillService')
+      const skills = await skillService.listUserSelectedSkills(userId)
+      const instructions = skills
+        .filter((s) => s.instruction)
+        .map((s) => `## Skill: ${s.name}\n${s.instruction}`)
+        .join('\n\n')
+      return instructions || null
+    } catch (error) {
+      logger.error('Failed to get skill instructions', error as Error)
+      throw error
+    }
+  })
+
   //only for mac
   if (isMac) {
     ipcMain.handle(IpcChannel.App_MacIsProcessTrusted, (): boolean => {
