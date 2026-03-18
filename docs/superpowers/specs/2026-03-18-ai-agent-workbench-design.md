@@ -1,6 +1,6 @@
 # AI Agent 工作台 - 设计文档
 
-**版本**: 2.0  
+**版本**: 3.0  
 **日期**: 2026-03-18  
 **状态**: 待评审
 
@@ -12,7 +12,7 @@
 
 **核心价值**：
 - 降低 AI 使用门槛，让产品、设计、测试、运维等非开发角色高效使用 AI
-- 通过 Agent + Skill 机制，管理员统一配置，成员个性化调整
+- Skill 市场机制，类 OpenCode，管理员统一配置 Skill，用户自主选择
 - 管理员集中管控企业 AI 能力，保障合规
 
 ---
@@ -22,8 +22,8 @@
 ### 阶段一：快速 Demo
 基于 Cherry Studio 进行定制，验证核心功能：
 - 用户切换 + 管理员配置
-- Agent + Skill 管理
-- 个人化 Skill 挂载
+- Agent 管理
+- Skill 市场 + 用户选择
 - 聚焦软件开发团队场景
 
 ### 阶段二：团队协作
@@ -41,7 +41,7 @@
 | 角色 | 说明 |
 |------|------|
 | **管理员** | 企业内部指定，负责配置公共 Agent、公共 Skill、AI 能力 |
-| **普通成员** | 使用公共 Agent、创建个人 Skill、个性化 Skill 挂载 |
+| **普通成员** | 使用公共 Agent、选择 Skill、创建个人 Skill |
 
 ### 3.2 管理员指定
 
@@ -76,7 +76,6 @@
 | 创建 Agent | ✅ | ❌ |
 | 编辑 Agent | ✅ | ❌ |
 | 删除 Agent | ✅ | ❌ |
-| 为 Agent 预设默认 Skill | ✅ | ❌ |
 | 使用 Agent | ✅ | ✅ |
 
 **原则**：管理员统一管控 Agent，成员仅可使用。
@@ -101,8 +100,7 @@
   "systemPrompt": "你是一个专业的测试工程师...",
   "model": "gpt-4o",
   "temperature": 0.7,
-  "defaultTools": ["web-search"],
-  "defaultSkills": ["skill-id-1", "skill-id-2"]
+  "tools": ["web-search"]
 }
 ```
 
@@ -112,13 +110,12 @@
 
 ### 5.1 什么是 Skill？
 
-Skill 定义了 Agent 的**扩展能力**，可被 Agent 挂载使用。
+Skill 定义了 Agent 的**扩展能力**，类 OpenCode 模式，按需加载。
 
 | | Agent | Skill |
 |--|-------|-------|
 | **定位** | 角色定位 | 具体能力 |
-| **数量** | 通常 1 个 | 可挂载多个 |
-| **配置** | system prompt、默认模型 | 触发条件、执行步骤 |
+| **使用方式** | 选择使用 | 自动/手动触发 |
 
 ### 5.2 Skill 定义
 
@@ -150,7 +147,7 @@ Skill 定义了 Agent 的**扩展能力**，可被 Agent 挂载使用。
 | 方式 | 说明 | 示例 |
 |------|------|------|
 | **手动触发** | 用户输入 `/skillName` | `/代码审查` |
-| **自动触发** | Agent 根据上下文自动调用 | 用户发送代码 → 自动触发 |
+| **自动触发** | Agent 根据上下文 + 用户已选 Skill 自动调用 | 用户发送代码 → 自动触发 |
 
 ### 5.4 Skill 可见性
 
@@ -159,54 +156,58 @@ Skill 定义了 Agent 的**扩展能力**，可被 Agent 挂载使用。
 | **管理员** | 所有人（公共 Skill） |
 | **普通成员** | 仅自己 + 可选择共享给团队 |
 
-### 5.5 Agent 与 Skill 挂载
-
-#### 管理员预设
-
-```
-Agent: 测试工程师
-├── 默认 Skill: 代码审查、API 文档生成
-└── 成员继承此默认值
-```
-
-#### 成员个性化
-
-```
-用户 A 的个性化挂载
-├── 继承默认: 代码审查、API 文档生成
-├── 增加: 日志分析
-└── 移除: API 文档生成
-
-用户 B 的个性化挂载
-├── 继承默认: 代码审查、API 文档生成
-├── 增加: 部署检查
-└── 移除: 无
-```
-
-**挂载逻辑**：
-1. 用户使用 Agent 时，查询个人挂载记录
-2. 有记录 → 使用个人化 Skill 列表
-3. 无记录 → 使用 Agent 的 defaultSkills（继承默认值）
-
 ---
 
-## 6. 权限矩阵
+## 6. Skill 市场
+
+### 6.1 用户旅程
+
+```
+1. 管理员创建公共 Skill
+    ↓
+2. 用户在 Skill 市场浏览/搜索
+    ↓
+3. 用户选择需要的 Skill（启用/禁用）
+    ↓
+4. 使用 Agent 时，只调用已选择的 Skill
+```
+
+### 6.2 Skill 市场界面
+
+```
+┌─────────────────────────────────────────────────┐
+│  Skill 市场                                      │
+├─────────────────────────────────────────────────┤
+│  🔍 搜索 Skill...                               │
+├─────────────────────────────────────────────────┤
+│  ☑ 代码审查        [已启用]  管理员 · 公共       │
+│     对代码进行安全性和质量审查                    │
+│                                                │
+│  ☑ API 文档生成    [已启用]  管理员 · 公共       │
+│     生成规范的 API 文档                          │
+│                                                │
+│  ☐ 日志分析        [未启用]  张三 · 共享          │
+│     分析日志，定位问题                           │
+│                                                │
+│  ☐ 部署检查        [未启用]  李四 · 个人          │
+│     检查部署脚本是否正确                         │
+└─────────────────────────────────────────────────┘
+```
+
+### 6.3 权限矩阵
 
 | 操作 | 管理员 | 普通成员 |
 |------|--------|----------|
 | **Agent** |
-| 创建 Agent | ✅ | ❌ |
-| 编辑 Agent | ✅ | ❌ |
-| 删除 Agent | ✅ | ❌ |
-| 为 Agent 预设默认 Skill | ✅ | ❌ |
+| 创建/编辑/删除 Agent | ✅ | ❌ |
 | 使用 Agent | ✅ | ✅ |
 | **Skill** |
 | 创建公共 Skill | ✅ | ❌ |
 | 创建个人 Skill | ✅ | ✅ |
 | 共享个人 Skill | ✅ | ✅ |
-| **Skill 挂载** |
-| 预设 Agent 默认 Skill | ✅ | ❌ |
-| 个人化 Skill 挂载 | ✅ | ✅ |
+| **Skill 市场** |
+| 在 Skill 市场选择 Skill | ✅ | ✅ |
+| 管理公共 Skill | ✅ | ❌ |
 | **其他** |
 | 快捷短语（个人） | ✅ | ✅ |
 | AI 配置 | ✅ | ❌ |
@@ -220,19 +221,16 @@ Agent: 测试工程师
 
 ```
 ┌─────────────────────────────────────────────────┐
-│  Logo  │  Agent市场  │  会话  │  快捷助手  │ 设置 │
+│  Logo  │  Agent市场  │  会话  │ Skill市场  │ 设置 │
 └─────────────────────────────────────────────────┘
 
 ├── Agent 市场
 │   └── 浏览/使用公共 Agent
 ├── 会话聊天
-│   ├── Agent 配置（个性化 Skill 挂载）
 │   ├── 消息输入
 │   ├── 文件上传（文档处理）
 │   └── 快捷短语
-├── 我的 Skill 管理
-│   ├── 创建/编辑个人 Skill
-│   └── 设置共享
+├── Skill 市场      ← 用户选择需要的 Skill
 └── 快捷助手/划词助手
 ```
 
@@ -240,16 +238,15 @@ Agent: 测试工程师
 
 ```
 ┌──────────────────────────────────────────────────────────────────┐
-│  Logo  │  Agent市场  │  会话  │  快捷助手  │ 设置  │  管理后台  │
+│  Logo  │  Agent市场  │  会话  │ Skill市场  │ 设置  │  管理后台  │
 └──────────────────────────────────────────────────────────────────┘
 
 ├── Agent 市场
 ├── 会话聊天
-├── 我的 Skill 管理
+├── Skill 市场
 └── 管理后台
     ├── 公共 Agent 管理
-    │   ├── 创建/编辑 Agent
-    │   └── 配置默认 Skill
+    │   └── 创建/编辑 Agent
     ├── 公共 Skill 管理
     │   └── 创建/编辑公共 Skill
     ├── AI 配置
@@ -287,7 +284,6 @@ CREATE TABLE agents (
     type VARCHAR(20) DEFAULT 'public',
     owner_id UUID REFERENCES users(id),
     config JSONB NOT NULL,
-    default_skills JSONB DEFAULT '[]',
     is_active BOOLEAN DEFAULT true,
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
@@ -309,13 +305,11 @@ CREATE TABLE skills (
     updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );
 
--- 用户对 Agent 的 Skill 挂载（个人化）
-CREATE TABLE user_agent_skills (
-    id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+-- 用户选择的 Skill（用户自选列表）
+CREATE TABLE user_selected_skills (
     user_id UUID REFERENCES users(id),
-    agent_id UUID REFERENCES agents(id),
-    skills JSONB NOT NULL DEFAULT '[]',
-    UNIQUE(user_id, agent_id)
+    skill_id UUID REFERENCES skills(id),
+    PRIMARY KEY (user_id, skill_id)
 );
 
 -- 快捷短语
@@ -333,20 +327,15 @@ CREATE TABLE quick_phrases (
 ### 8.2 ER 关系
 
 ```
-┌──────────┐       ┌──────────┐       ┌──────────┐
-│   User   │───────│  Agent   │───────│  Skill   │
-└──────────┘       └──────────┘       └──────────┘
-      │                  │                  │
-      │            ┌─────┴─────┐            │
-      │            │  User     │            │
-      │            │  Agent    │            │
-      │            │  Skills   │            │
-      │            │  (个人化)  │            │
-      │            └───────────┘            │
-      │                                      │
-      └────────── QuickPhrases              │
-                                             │
-              (Personal Skills)──────────────┘
+┌──────────┐       ┌──────────┐
+│   User   │───────│  Agent   │
+└──────────┘       └──────────┘
+      │
+      │      ┌──────────┐
+      ├──────│  Skill   │
+      │      └──────────┘
+      │            │
+      └───── user_selected_skills (用户自选)
 ```
 
 ---
@@ -372,9 +361,9 @@ CREATE TABLE quick_phrases (
 |------|------|
 | 用户切换 | 本地存储、界面切换 |
 | 管理后台 | Agent/Skill CRUD |
-| Skill 管理 | 个人/公共 Skill CRUD、共享设置 |
-| Agent-Skill 挂载 | 个人化挂载、继承默认 |
+| Skill 市场 | 浏览、选择/取消 Skill |
 | 界面区分 | 管理员 vs 成员菜单 |
+| Skill 上下文注入 | 将用户选择的 Skill 注入对话 |
 
 ### 9.3 配置扩展
 
@@ -383,9 +372,7 @@ CREATE TABLE quick_phrases (
   "organization": {
     "name": "XXX 技术团队",
     "adminUsers": ["user-id-1"]
-  },
-  "visibleAgents": ["agent-id-1", "agent-id-2"],
-  "publicSkills": ["skill-id-1"]
+  }
 }
 ```
 
