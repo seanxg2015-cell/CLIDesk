@@ -1,10 +1,5 @@
 {
   "admin": {
-    "agents": "Public Agents",
-    "skills": "Public Skills",
-    "users": "User Management"
-  },
-  "admin": {
     "agents": {
       "actions": "Actions",
       "avatar": "Avatar",
@@ -34,8 +29,35 @@
       "validationError": "Please fill in required fields"
     },
     "skills": {
+      "actions": "Actions",
+      "create": "Create Skill",
+      "createError": "Failed to create skill",
+      "createSuccess": "Skill created successfully",
+      "createTitle": "Create Skill",
+      "deleteConfirm": "Are you sure you want to delete this skill?",
+      "deleteError": "Failed to delete skill",
+      "deleteSuccess": "Skill deleted successfully",
       "description": "Manage team skills",
-      "title": "Skills"
+      "description": "Description",
+      "descriptionPlaceholder": "Enter description",
+      "editTitle": "Edit Skill",
+      "fetchError": "Failed to fetch skills",
+      "icon": "Icon",
+      "iconPlaceholder": "Emoji icon",
+      "instruction": "Instruction",
+      "instructionPlaceholder": "Enter skill instruction",
+      "isPublic": "Public",
+      "jsonError": "Invalid JSON format",
+      "name": "Name",
+      "namePlaceholder": "Enter skill name",
+      "steps": "Steps",
+      "stepsPlaceholder": "[{\"step\": 1, \"action\": \"...\"}]",
+      "title": "Skills",
+      "triggerConfig": "Trigger Config",
+      "triggerConfigPlaceholder": "{\"keywords\": [\"code\", \"review\"]}",
+      "updateError": "Failed to update skill",
+      "updateSuccess": "Skill updated successfully",
+      "validationError": "Please fill in required fields"
     },
     "users": {
       "description": "Manage team users",
@@ -5515,6 +5537,20 @@
       "reset": "Reset",
       "title": "Page Zoom"
     }
+  },
+  "skillMarket": {
+    "description": "Browse and enable skills for your AI assistant",
+    "deselectSuccess": "{{name}} disabled",
+    "empty": "No skills available",
+    "enable": "Enable",
+    "enabled": "Enabled",
+    "fetchError": "Failed to fetch skills",
+    "noResults": "No skills match your search",
+    "searchPlaceholder": "Search skills...",
+    "selectSuccess": "{{name}} enabled",
+    "selected": "Selected",
+    "title": "Skill Market",
+    "toggleError": "Failed to update skill"
   },
   "title": {
     "apps": "Apps",

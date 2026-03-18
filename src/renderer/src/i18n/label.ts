@@ -196,7 +196,8 @@ const sidebarIconKeyMap = {
   code_tools: 'code.title',
   notes: 'notes.title',
   openclaw: 'openclaw.title',
-  admin: 'sidebar.admin'
+  admin: 'sidebar.admin',
+  'skill-market': 'skillMarket.title'
 } as const
 
 export const getSidebarIconLabel = (key: string): string => {

@@ -1,10 +1,5 @@
 {
   "admin": {
-    "agents": "公共 Agent",
-    "skills": "公共 Skill",
-    "users": "用户管理"
-  },
-  "admin": {
     "agents": {
       "actions": "操作",
       "avatar": "头像",
@@ -34,8 +29,35 @@
       "validationError": "请填写必填字段"
     },
     "skills": {
+      "actions": "操作",
+      "create": "创建 Skill",
+      "createError": "创建 Skill 失败",
+      "createSuccess": "Skill 创建成功",
+      "createTitle": "创建 Skill",
+      "deleteConfirm": "确定要删除此 Skill 吗？",
+      "deleteError": "删除 Skill 失败",
+      "deleteSuccess": "Skill 删除成功",
       "description": "管理团队技能",
-      "title": "技能"
+      "description": "描述",
+      "descriptionPlaceholder": "请输入描述",
+      "editTitle": "编辑 Skill",
+      "fetchError": "获取 Skill 列表失败",
+      "icon": "图标",
+      "iconPlaceholder": "Emoji 图标",
+      "instruction": "指令",
+      "instructionPlaceholder": "请输入 Skill 指令",
+      "isPublic": "公开",
+      "jsonError": "JSON 格式无效",
+      "name": "名称",
+      "namePlaceholder": "请输入 Skill 名称",
+      "steps": "步骤",
+      "stepsPlaceholder": "[{\"step\": 1, \"action\": \"...\"}]",
+      "title": "技能",
+      "triggerConfig": "触发配置",
+      "triggerConfigPlaceholder": "{\"keywords\": [\"code\", \"review\"]}",
+      "updateError": "更新 Skill 失败",
+      "updateSuccess": "Skill 更新成功",
+      "validationError": "请填写必填字段"
     },
     "users": {
       "description": "管理团队用户",
@@ -5515,6 +5537,20 @@
       "reset": "重置",
       "title": "缩放"
     }
+  },
+  "skillMarket": {
+    "description": "浏览并启用 AI 助手技能",
+    "deselectSuccess": "已禁用 {{name}}",
+    "empty": "暂无可用技能",
+    "enable": "启用",
+    "enabled": "已启用",
+    "fetchError": "获取技能列表失败",
+    "noResults": "没有匹配的技能",
+    "searchPlaceholder": "搜索技能...",
+    "selectSuccess": "已启用 {{name}}",
+    "selected": "已选择",
+    "title": "技能市场",
+    "toggleError": "更新技能失败"
   },
   "title": {
     "apps": "小程序",

@@ -27,6 +27,7 @@ import AdminLayout from './pages/admin/AdminLayout'
 import AdminAgentsPage from './pages/admin/AdminAgentsPage'
 import AdminSkillsPage from './pages/admin/AdminSkillsPage'
 import AdminUsersPage from './pages/admin/AdminUsersPage'
+import SkillMarketPage from './pages/skill-market/SkillMarketPage'
 
 const Router: FC = () => {
   const { navbarPosition } = useNavbarPosition()
@@ -54,6 +55,7 @@ const Router: FC = () => {
             <Route path="skills" element={<AdminSkillsPage />} />
             <Route path="users" element={<AdminUsersPage />} />
           </Route>
+          <Route path="/skill-market" element={<SkillMarketPage />} />
         </Routes>
       </ErrorBoundary>
     )
