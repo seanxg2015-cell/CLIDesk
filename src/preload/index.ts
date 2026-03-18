@@ -21,6 +21,7 @@ import { IpcChannel } from '@shared/IpcChannel'
 import type { Notification } from '@types'
 import type {
   AddMemoryOptions,
+  AgentBaseWithId,
   AssistantMessage,
   FileListResponse,
   FileMetadata,
@@ -698,6 +699,13 @@ const api = {
   },
   analytics: {
     trackTokenUsage: (data: TokenUsageData) => ipcRenderer.invoke(IpcChannel.Analytics_TrackTokenUsage, data)
+  },
+  agentAdmin: {
+    listPublic: () => ipcRenderer.invoke(IpcChannel.AgentAdmin_ListPublic),
+    create: (data: Partial<AgentBaseWithId>) => ipcRenderer.invoke(IpcChannel.AgentAdmin_Create, data),
+    update: (id: string, updates: Partial<AgentBaseWithId>) =>
+      ipcRenderer.invoke(IpcChannel.AgentAdmin_Update, id, updates),
+    delete: (id: string) => ipcRenderer.invoke(IpcChannel.AgentAdmin_Delete, id)
   }
 }
 

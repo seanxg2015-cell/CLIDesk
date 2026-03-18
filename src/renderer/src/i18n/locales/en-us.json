@@ -4,6 +4,44 @@
     "skills": "Public Skills",
     "users": "User Management"
   },
+  "admin": {
+    "agents": {
+      "actions": "Actions",
+      "avatar": "Avatar",
+      "avatarPlaceholder": "Emoji icon",
+      "create": "Create Agent",
+      "createError": "Failed to create agent",
+      "createSuccess": "Agent created successfully",
+      "createTitle": "Create Agent",
+      "deleteConfirm": "Are you sure you want to delete this agent?",
+      "deleteError": "Failed to delete agent",
+      "deleteSuccess": "Agent deleted successfully",
+      "description": "Manage team public agents",
+      "description": "Description",
+      "descriptionPlaceholder": "Enter description",
+      "editTitle": "Edit Agent",
+      "fetchError": "Failed to fetch agents",
+      "instructions": "Instructions",
+      "instructionsPlaceholder": "Enter system instructions",
+      "isActive": "Active",
+      "isPublic": "Public",
+      "model": "Model",
+      "name": "Name",
+      "namePlaceholder": "Enter agent name",
+      "title": "Public Agents",
+      "updateError": "Failed to update agent",
+      "updateSuccess": "Agent updated successfully",
+      "validationError": "Please fill in required fields"
+    },
+    "skills": {
+      "description": "Manage team skills",
+      "title": "Skills"
+    },
+    "users": {
+      "description": "Manage team users",
+      "title": "Users"
+    }
+  },
   "agent": {
     "add": {
       "description": "Handle complex tasks with various tools",
@@ -1444,6 +1482,16 @@
     "uploaded_image": "Uploaded image",
     "warning": "Warning",
     "you": "You"
+  },
+  "common": {
+    "cancel": "Cancel",
+    "close": "Close",
+    "create": "Create",
+    "delete": "Delete",
+    "edit": "Edit",
+    "no": "No",
+    "save": "Save",
+    "yes": "Yes"
   },
   "dialog": {
     "all_files": "All Files",

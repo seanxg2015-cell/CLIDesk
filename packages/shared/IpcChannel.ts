@@ -112,6 +112,12 @@ export enum IpcChannel {
   AgentToolPermission_Response = 'agent-tool-permission:response',
   AgentToolPermission_Result = 'agent-tool-permission:result',
 
+  // Agent Admin (for team management)
+  AgentAdmin_ListPublic = 'agent-admin:list-public',
+  AgentAdmin_Create = 'agent-admin:create',
+  AgentAdmin_Update = 'agent-admin:update',
+  AgentAdmin_Delete = 'agent-admin:delete',
+
   //copilot
   Copilot_GetAuthMessage = 'copilot:get-auth-message',
   Copilot_GetCopilotToken = 'copilot:get-copilot-token',

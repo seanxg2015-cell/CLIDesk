@@ -4,6 +4,44 @@
     "skills": "公共 Skill",
     "users": "用户管理"
   },
+  "admin": {
+    "agents": {
+      "actions": "操作",
+      "avatar": "头像",
+      "avatarPlaceholder": "Emoji 图标",
+      "create": "创建 Agent",
+      "createError": "创建 Agent 失败",
+      "createSuccess": "Agent 创建成功",
+      "createTitle": "创建 Agent",
+      "deleteConfirm": "确定要删除此 Agent 吗？",
+      "deleteError": "删除 Agent 失败",
+      "deleteSuccess": "Agent 删除成功",
+      "description": "管理团队公共 Agent",
+      "description": "描述",
+      "descriptionPlaceholder": "请输入描述",
+      "editTitle": "编辑 Agent",
+      "fetchError": "获取 Agent 列表失败",
+      "instructions": "指令",
+      "instructionsPlaceholder": "请输入系统指令",
+      "isActive": "启用",
+      "isPublic": "公开",
+      "model": "模型",
+      "name": "名称",
+      "namePlaceholder": "请输入 Agent 名称",
+      "title": "公共 Agent",
+      "updateError": "更新 Agent 失败",
+      "updateSuccess": "Agent 更新成功",
+      "validationError": "请填写必填字段"
+    },
+    "skills": {
+      "description": "管理团队技能",
+      "title": "技能"
+    },
+    "users": {
+      "description": "管理团队用户",
+      "title": "用户"
+    }
+  },
   "agent": {
     "add": {
       "description": "调用各种工具处理复杂任务",
@@ -1444,6 +1482,16 @@
     "uploaded_image": "已上传图片",
     "warning": "警告",
     "you": "用户"
+  },
+  "common": {
+    "cancel": "取消",
+    "close": "关闭",
+    "create": "创建",
+    "delete": "删除",
+    "edit": "编辑",
+    "no": "否",
+    "save": "保存",
+    "yes": "是"
   },
   "dialog": {
     "all_files": "所有文件",

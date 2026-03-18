@@ -12,7 +12,7 @@ const AdminLayout: React.FC = () => {
   const isAdmin = useAppSelector((state) => state.settings.isAdmin)
   const { pathname } = useLocation()
   const { t } = useTranslation()
-  const { isTopNavbar } = useNavbarPosition()
+  const { isLeftNavbar } = useNavbarPosition()
 
   if (!isAdmin) {
     return <Navigate to="/" replace />
@@ -21,7 +21,7 @@ const AdminLayout: React.FC = () => {
   const selectedKey = pathname.split('/').pop() || 'agents'
 
   return (
-    <AdminLayoutContainer>
+    <AdminLayoutContainer $isLeftNavbar={isLeftNavbar}>
       <Sider width={200} style={{ background: 'var(--color-background)' }}>
         <Menu
           mode="inline"
@@ -31,17 +31,17 @@ const AdminLayout: React.FC = () => {
             {
               key: 'agents',
               icon: <RobotOutlined />,
-              label: <Link to="/admin/agents">{t('admin.agents')}</Link>
+              label: <Link to="/admin/agents">{t('admin.agents.title')}</Link>
             },
             {
               key: 'skills',
               icon: <ThunderboltOutlined />,
-              label: <Link to="/admin/skills">{t('admin.skills')}</Link>
+              label: <Link to="/admin/skills">{t('admin.skills.title')}</Link>
             },
             {
               key: 'users',
               icon: <UserOutlined />,
-              label: <Link to="/admin/users">{t('admin.users')}</Link>
+              label: <Link to="/admin/users">{t('admin.users.title')}</Link>
             }
           ]}
         />
@@ -53,9 +53,9 @@ const AdminLayout: React.FC = () => {
   )
 }
 
-const AdminLayoutContainer = styled(Layout)`
-  min-height: calc(100vh - ${() => (isTopNavbar ? 'var(--navbar-height)' : '0px')});
-  margin-top: ${() => (isTopNavbar ? 'var(--navbar-height)' : '0px')};
+const AdminLayoutContainer = styled(Layout)<{ $isLeftNavbar: boolean }>`
+  min-height: calc(100vh - ${({ $isLeftNavbar }) => ($isLeftNavbar ? '0px' : 'var(--navbar-height)')});
+  margin-top: ${({ $isLeftNavbar }) => ($isLeftNavbar ? 'var(--navbar-height)' : '0px')};
 `
 
 export default AdminLayout

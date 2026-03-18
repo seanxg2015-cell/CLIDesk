@@ -278,6 +278,61 @@ export async function registerIpc(mainWindow: BrowserWindow, app: Electron.App) 
     }
   )
 
+  // Agent Admin handlers
+  ipcMain.handle(IpcChannel.AgentAdmin_ListPublic, async () => {
+    try {
+      const database = await agentService.getDatabase()
+      const { eq } = await import('drizzle-orm')
+      const { agentsTable } = await import('@main/services/agents/database/schema')
+      return await database.select().from(agentsTable).where(eq(agentsTable.is_public, true))
+    } catch (error) {
+      logger.error('Failed to list public agents', error as Error)
+      throw error
+    }
+  })
+
+  ipcMain.handle(IpcChannel.AgentAdmin_Create, async (_event, data) => {
+    try {
+      return await agentService.createAgent(data)
+    } catch (error) {
+      logger.error('Failed to create agent', error as Error)
+      throw error
+    }
+  })
+
+  ipcMain.handle(IpcChannel.AgentAdmin_Update, async (_event, id, updates) => {
+    try {
+      const { eq } = await import('drizzle-orm')
+      const { agentsTable } = await import('@main/services/agents/database/schema')
+      const database = await agentService.getDatabase()
+      const now = new Date().toISOString()
+
+      const serializedUpdates = agentService.serializeJsonFields(updates)
+      await database
+        .update(agentsTable)
+        .set({ ...serializedUpdates, updated_at: now })
+        .where(eq(agentsTable.id, id))
+
+      return await agentService.getAgent(id)
+    } catch (error) {
+      logger.error('Failed to update agent', error as Error)
+      throw error
+    }
+  })
+
+  ipcMain.handle(IpcChannel.AgentAdmin_Delete, async (_event, id) => {
+    try {
+      const { eq } = await import('drizzle-orm')
+      const { agentsTable } = await import('@main/services/agents/database/schema')
+      const database = await agentService.getDatabase()
+      await database.delete(agentsTable).where(eq(agentsTable.id, id))
+      return { success: true }
+    } catch (error) {
+      logger.error('Failed to delete agent', error as Error)
+      throw error
+    }
+  })
+
   //only for mac
   if (isMac) {
     ipcMain.handle(IpcChannel.App_MacIsProcessTrusted, (): boolean => {

@@ -9,7 +9,10 @@ export const agentsTable = sqliteTable('agents', {
   type: text('type').notNull(),
   name: text('name').notNull(),
   description: text('description'),
+  avatar: text('avatar'), // Emoji or icon for the agent
   accessible_paths: text('accessible_paths'), // JSON array of directory paths the agent can access
+  is_public: integer('is_public', { mode: 'boolean' }).default(false), // Public agent visible to all users
+  is_active: integer('is_active', { mode: 'boolean' }).default(true), // Agent enabled/disabled
 
   instructions: text('instructions'),
 
