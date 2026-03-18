@@ -8,441 +8,354 @@
 
 ## 1. 产品定位
 
-**AI Agent 工作台** - 面向软件开发团队的一站式 Agent 平台，通过预设的 Agent 能力帮助产品经理、设计师、测试工程师、运维人员等非开发角色高效完成日常工作。
+**AI Agent 工作台** - 基于 Cherry Studio 定制的团队 AI 协作平台，聚焦软件开发团队场景。
 
 **核心价值**：
-- 降低 AI 使用门槛，让非技术人员也能高效使用 AI
-- 统一管理企业 AI 能力，保障数据安全
-- 沉淀团队知识，提供个性化 Agent 服务
+- 降低 AI 使用门槛，让产品、设计、测试、运维等非开发角色高效使用 AI
+- 通过 Agent + Skill 机制，团队成员可定制化自己的 AI 助手
+- 管理员统一管控企业 AI 能力，保障数据安全
 
 ---
 
-## 2. 技术架构
+## 2. 阶段规划
 
-### 2.1 整体架构
+### 阶段一：快速 Demo
+基于 Cherry Studio 进行定制，验证核心功能：
+- 用户切换 + 管理员配置
+- Agent + Skill 管理
+- 聚焦软件开发团队场景
 
+### 阶段二：团队协作
+增加后台服务：
+- 企业 SSO 登录
+- 用户/团队管理
+- 数据同步
+
+---
+
+## 3. 用户系统
+
+### 3.1 角色
+
+| 角色 | 说明 |
+|------|------|
+| **管理员** | 企业内部指定，负责配置公共 Agent、公共 Skill、AI 能力 |
+| **普通成员** | 使用公共 Agent、创建个人 Agent/Skill |
+
+### 3.2 管理员指定
+
+通过配置文件指定管理员：
+
+```json
+// config/admin-config.json
+{
+  "adminUsers": [
+    "user-id-1",
+    "user-id-2"
+  ],
+  "organizationName": "XXX 技术团队"
+}
 ```
-┌─────────────────────────────────────────────────────────────┐
-│                      Vue 3 前端                              │
-│         (会话界面 / Agent 市场 / 个人 Agent 管理)             │
-│                    http://localhost:5173                      │
-└─────────────────────────┬───────────────────────────────────┘
-                          │ HTTP REST API
-                          ▼
-┌─────────────────────────────────────────────────────────────┐
-│                 Java Spring Boot 后端                        │
-│      (用户管理 / 会话管理 / Agent 配置 / 权限控制)            │
-│                        :8080                                 │
-│  ┌─────────────┐  ┌─────────────┐  ┌─────────────────┐    │
-│  │ User模块    │  │ Session模块 │  │ Agent模块        │    │
-│  └─────────────┘  └─────────────┘  └─────────────────┘    │
-└─────────────────────────┬───────────────────────────────────┘
-                          │ REST API
-                          ▼
-┌─────────────────────────────────────────────────────────────┐
-│                   Node.js AI Service                        │
-│         (复用 @cherrystudio/ai-core)                        │
-│                     Agent调度 / 中间件                       │
-│                        :3000                                 │
-│  ┌─────────────┐  ┌─────────────┐  ┌─────────────────┐    │
-│  │ Provider    │  │ Middleware  │  │ 流式输出(SSE)   │    │
-│  │ (Copilot/   │  │ (日志/重试/ │  │                 │    │
-│  │  OpenAI等)  │  │  错误处理)  │  │                 │    │
-│  └─────────────┘  └─────────────┘  └─────────────────┘    │
-└─────────────────────────────────────────────────────────────┘
+
+### 3.3 用户切换
+
+简单用户切换器（本地存储）：
+- 点击头像/名称打开下拉菜单
+- 选择用户切换
+- 新用户添加后自动进入
+
+---
+
+## 4. Agent 系统
+
+### 4.1 Agent 类型
+
+| 类型 | 创建者 | 可见范围 |
+|------|--------|----------|
+| **公共 Agent** | 管理员 | 所有成员 |
+| **个人 Agent** | 普通成员 | 仅创建者 |
+
+### 4.2 预置 Agent（聚焦软件开发团队）
+
+| 类别 | Agent 示例 |
+|------|-----------|
+| **开发** | 代码审查、单元测试生成、代码解释、技术文档 |
+| **产品** | PRD 撰写、需求分析、用户故事、竞品对比 |
+| **测试** | 测试用例生成、测试报告、回归测试分析 |
+| **运维** | 部署脚本、日志分析、故障排查、服务器配置 |
+| **通用** | 翻译助手、会议纪要、总结归纳 |
+
+### 4.3 Agent 配置
+
+```json
+{
+  "name": "测试工程师",
+  "description": "专业的测试工程师助手",
+  "avatar": "🧪",
+  "systemPrompt": "你是一个专业的测试工程师...",
+  "model": "gpt-4o",
+  "temperature": 0.7,
+  "defaultTools": ["web-search"],
+  "defaultSkills": ["代码审查", "API 文档生成"]
+}
 ```
 
-### 2.2 技术栈
+---
 
-| 层级 | 技术 | 说明 |
+## 5. Skill 系统
+
+### 5.1 什么是 Skill？
+
+Skill 定义了 Agent 的**扩展能力**，可被 Agent 挂载使用。
+
+| | Agent | Skill |
+|--|-------|-------|
+| **定位** | 角色定位 | 具体能力 |
+| **数量** | 通常 1 个 | 可挂载多个 |
+| **配置** | system prompt、默认模型 | 触发条件、执行步骤 |
+
+### 5.2 Skill 定义
+
+```json
+{
+  "name": "代码审查",
+  "description": "对代码进行安全性和质量审查",
+  "icon": "🔍",
+  "trigger": {
+    "manual": true,
+    "autoKeywords": [
+      "帮我看看这段代码",
+      "review",
+      "审查代码"
+    ]
+  },
+  "instruction": "你是一个专业的代码审查助手...",
+  "steps": [
+    "检查 SQL 注入风险",
+    "检查 XSS 漏洞",
+    "检查敏感信息泄露",
+    "检查代码规范"
+  ]
+}
+```
+
+### 5.3 Skill 触发方式
+
+| 方式 | 说明 | 示例 |
 |------|------|------|
-| 前端 | Vue 3 + TypeScript + Vite + Pinia + TailwindCSS | SPA 单页应用 |
-| 后端 | Java Spring Boot 3 + MyBatis-Plus | REST API 服务 |
-| AI 层 | Node.js + Express + @cherrystudio/ai-core | AI 能力封装 |
-| 数据库 | PostgreSQL + pgvector | 结构化数据 + 向量存储 |
-| 缓存 | Redis（可选） | 会话缓存、分布式锁 |
-| 部署 | Docker Compose | 容器化部署 |
+| **手动触发** | 用户输入 `/skillName` | `/代码审查` |
+| **自动触发** | Agent 根据上下文自动调用 | 用户发送代码 → 自动触发 |
 
-### 2.3 关键路径别名
+### 5.4 Skill 可见性
 
-| 别名 | 指向 |
-|------|------|
-| - | - |
+| 创建者 | 可见范围 |
+|--------|----------|
+| **管理员** | 所有人（公共 Skill） |
+| **普通成员** | 仅自己 + 可选择共享给团队 |
+
+### 5.5 Agent 与 Skill 挂载
+
+```
+Agent: 测试工程师（管理员预设默认 Skill）
+├── 默认挂载: 代码审查、API 文档生成
+│
+用户 A 的个性化挂载
+├── 继承默认: 代码审查
+├── 新增: 日志分析
+└── 移除: API 文档生成
+
+用户 B 的个性化挂载
+├── 继承默认: 代码审查、API 文档生成
+├── 新增: 部署检查
+└── 移除: 无
+```
+
+**挂载逻辑**：
+1. 用户使用 Agent 时，查询个人挂载记录
+2. 有记录 → 使用个人化 Skill 列表
+3. 无记录 → 使用 Agent 的 defaultSkills（继承默认值）
 
 ---
 
-## 3. 功能模块
+## 6. 页面结构
 
-### 3.1 用户与认证
+### 6.1 普通成员界面
 
-**登录方式**：
-- **SSO（主）** - Microsoft Entra ID 企业账号登录
-- **邮箱密码（备）** - 备用入口 + 外部协作者
+```
+┌─────────────────────────────────────────────────┐
+│  Logo  │  Agent市场  │  会话  │  快捷助手  │ 设置 │
+└─────────────────────────────────────────────────┘
 
-**权限模型**：
+├── Agent 市场（浏览/使用公共 Agent）
+├── 会话聊天
+│   ├── 消息输入
+│   ├── 文件上传（文档处理）
+│   ├── 快捷短语（个人）
+│   └── 搜索开关
+├── 个人 Agent 管理
+│   ├── 创建/编辑 Agent
+│   └── 配置个人 Skill 挂载
+├── 我的 Skill 管理
+│   ├── 创建/编辑 Skill
+│   └── 设置共享
+└── 快捷助手/划词助手
+```
 
-| 角色 | 权限 |
-|------|------|
-| 管理员 | 管理公共 Agent、组织成员、系统配置 |
-| 普通成员 | 使用 Agent、创建个人 Agent |
+### 6.2 管理员界面
 
-**数据库表**：
+```
+┌──────────────────────────────────────────────────────────────────┐
+│  Logo  │  Agent市场  │  会话  │  快捷助手  │ 设置  │  管理后台  │
+└──────────────────────────────────────────────────────────────────┘
+
+├── Agent 市场
+├── 会话聊天
+├── 个人 Agent / Skill 管理
+└── 管理后台
+    ├── 公共 Agent 管理
+    │   ├── 创建/编辑 Agent
+    │   ├── 配置默认 Skill
+    │   └── 设置可见范围
+    ├── 公共 Skill 管理
+    ├── AI 配置
+    │   ├── Provider 管理
+    │   ├── 模型管理
+    │   └── MCP Server
+    ├── 快捷短语（公共）
+    └── 全局记忆配置
+```
+
+---
+
+## 7. 数据库设计
+
+### 7.1 表结构
 
 ```sql
 -- 用户表
 CREATE TABLE users (
     id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
-    email VARCHAR(255) UNIQUE NOT NULL,
-    password_hash VARCHAR(255),  -- SSO用户可为空
-    name VARCHAR(100),
-    external_id VARCHAR(255),     -- SSO提供商用户ID
-    role VARCHAR(20) DEFAULT 'member',
-    organization_id UUID,
-    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-    updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
-);
-
--- 组织表
-CREATE TABLE organizations (
-    id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
     name VARCHAR(100) NOT NULL,
+    email VARCHAR(255) UNIQUE,
+    is_admin BOOLEAN DEFAULT false,
+    organization_id UUID,
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );
 
--- 组织成员关联
-CREATE TABLE organization_members (
-    organization_id UUID REFERENCES organizations(id),
-    user_id UUID REFERENCES users(id),
-    joined_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-    PRIMARY KEY (organization_id, user_id)
-);
-
--- SSO配置表（预留）
-CREATE TABLE sso_providers (
-    id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
-    provider VARCHAR(50) NOT NULL,  -- 'azure_ad', 'okta', etc.
-    config JSONB,
-    enabled BOOLEAN DEFAULT false,
-    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
-);
-```
-
-### 3.2 Agent 管理
-
-**Agent 类型**：
-
-| 类型 | 创建者 | 可见范围 |
-|------|--------|----------|
-| 公共 Agent | 管理员 | 全组织成员 |
-| 个人 Agent | 普通成员 | 仅创建者 |
-
-**数据库表**：
-
-```sql
+-- Agent 表
 CREATE TABLE agents (
     id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
     name VARCHAR(100) NOT NULL,
     description TEXT,
-    avatar VARCHAR(500),        -- 头像URL
-    type VARCHAR(20) DEFAULT 'public',  -- 'public' | 'personal'
+    avatar VARCHAR(50),
+    type VARCHAR(20) DEFAULT 'public',
     owner_id UUID REFERENCES users(id),
-    organization_id UUID REFERENCES organizations(id),
-    config JSONB NOT NULL,      -- Agent配置（含system prompt、model等）
+    config JSONB NOT NULL,
+    default_skills JSONB DEFAULT '[]',
     is_active BOOLEAN DEFAULT true,
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );
-```
 
-**Agent 配置结构** (JSONB)：
-
-```json
-{
-  "systemPrompt": "你是一个专业的技术文档助手...",
-  "model": "openai/gpt-4o",
-  "temperature": 0.7,
-  "maxTokens": 4096,
-  "tools": ["web-search", "code-executor"],
-  "plugins": []
-}
-```
-
-### 3.3 会话管理
-
-**功能**：
-- 创建/查询/删除会话
-- 消息持久化
-- 流式响应（SSE）
-
-**数据库表**：
-
-```sql
--- 会话表
-CREATE TABLE sessions (
+-- Skill 表
+CREATE TABLE skills (
     id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
-    user_id UUID REFERENCES users(id),
-    agent_id UUID REFERENCES agents(id),
-    title VARCHAR(200),
+    name VARCHAR(100) NOT NULL,
+    description TEXT,
+    icon VARCHAR(50),
+    trigger_config JSONB NOT NULL,
+    instruction TEXT NOT NULL,
+    steps JSONB,
+    owner_id UUID REFERENCES users(id),
+    is_shared BOOLEAN DEFAULT false,
+    is_public BOOLEAN DEFAULT false,
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );
 
--- 消息表
-CREATE TABLE messages (
+-- 用户对 Agent 的 Skill 挂载（个人化）
+CREATE TABLE user_agent_skills (
     id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
-    session_id UUID REFERENCES sessions(id),
-    role VARCHAR(20) NOT NULL,  -- 'user' | 'assistant' | 'system'
+    user_id UUID REFERENCES users(id),
+    agent_id UUID REFERENCES agents(id),
+    skills JSONB NOT NULL DEFAULT '[]',
+    UNIQUE(user_id, agent_id)
+);
+
+-- 快捷短语
+CREATE TABLE quick_phrases (
+    id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+    user_id UUID REFERENCES users(id),
+    name VARCHAR(100) NOT NULL,
     content TEXT NOT NULL,
-    metadata JSONB,             -- 附件、模型信息等
+    category VARCHAR(50),
+    sort_order INT DEFAULT 0,
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );
 ```
 
-### 3.4 AI 调用
+### 7.2 ER 关系
 
-**与 Node.js AI Service 接口**：
+```
+┌──────────┐       ┌──────────┐       ┌──────────┐
+│   User   │───────│  Agent   │───────│  Skill   │
+└──────────┘       └──────────┘       └──────────┘
+      │                  │                  │
+      │            ┌──────┴──────┐          │
+      │            │ UserAgent   │          │
+      │            │ Skills      │          │
+      │            └─────────────┘          │
+      │                                      │
+      └────────── QuickPhrases              │
+                                             │
+              (Personal Skills)──────────────┘
+```
 
-```typescript
-// 聊天请求
-POST /ai/chat
-Content-Type: application/json
+---
 
+## 8. 技术实现
+
+### 8.1 复用 Cherry Studio
+
+| 功能 | 复用方式 |
+|------|----------|
+| Agent 系统 | 直接复用 |
+| MCP 集成 | 直接复用 |
+| 知识库/RAG | 直接复用 |
+| 全局记忆 | 直接复用 |
+| 文档处理 | 直接复用 |
+| 划词助手 | 直接复用 |
+| 快捷助手 | 直接复用 |
+| 会话聊天 | 直接复用 |
+
+### 8.2 需要开发
+
+| 功能 | 说明 |
+|------|------|
+| 用户切换 | 本地存储、界面切换 |
+| 管理后台 | Agent/Skill CRUD |
+| Skill 管理 | Skill CRUD、共享设置 |
+| Agent-Skill 挂载 | 用户个性化挂载 |
+| 界面区分 | 管理员 vs 成员 |
+
+### 8.3 配置扩展
+
+```json
 {
-  "agentId": "uuid",
-  "messages": [
-    { "role": "system", "content": "..." },
-    { "role": "user", "content": "你好" }
-  ],
-  "stream": true
-}
-
-// 响应 (SSE)
-data: {"type": "delta", "content": "你好"}
-data: {"type": "delta", "content": "，有什么"}
-data: [DONE]
-
-// 获取可用模型
-GET /ai/models
-
-// 测试Provider连接
-POST /ai/providers/test
-```
-
-**Java 后端调用 AI Service**：
-
-```java
-@Service
-public class AiService {
-    
-    @Value("${ai.service.url}")
-    private String aiServiceUrl;
-    
-    public Flux<String> chat(ChatRequest request) {
-        return webClient.post()
-            .uri(aiServiceUrl + "/ai/chat")
-            .bodyValue(request)
-            .retrieve()
-            .bodyToFlux(String.class);
-    }
-}
-```
-
----
-
-## 4. 前端页面
-
-### 4.1 页面结构
-
-```
-├── 登录页
-│   └── SSO登录 / 邮箱密码登录
-├── Agent 市场
-│   └── Agent列表 / 搜索 / 收藏
-├── 会话聊天（主界面）
-│   └── Agent选择 / 消息输入 / 文件上传
-├── 个人 Agent
-│   └── 我的Agent列表 / 创建 / 编辑
-└── 管理后台
-    ├── 公共Agent管理
-    └── 用户管理
-```
-
-### 4.2 核心页面说明
-
-**Agent 市场**：
-- 展示所有公共 Agent
-- 支持按名称、功能搜索
-- 点击进入对应 Agent 聊天
-
-**会话聊天**：
-- 左侧：Agent 选择 + 会话列表
-- 中间：消息流（Markdown 渲染、代码高亮）
-- 右侧：Agent 配置面板
-
-**个人 Agent 管理**：
-- 创建新 Agent（填写名称、描述、配置）
-- 编辑已有 Agent
-- 删除 Agent
-
----
-
-## 5. Node.js AI Service 设计
-
-### 5.1 复用能力
-
-| 能力 | 来源 | 说明 |
-|------|------|------|
-| Provider 管理 | @cherrystudio/ai-core | 支持 Copilot、OpenAI、Claude 等 |
-| 中间件链 | @cherrystudio/ai-core | 日志、重试、错误处理 |
-| Agent 调度 | @cherrystudio/ai-core | 解析配置、组装 system prompt |
-| 流式输出 | @cherrystudio/ai-core | SSE 实时推送 |
-
-### 5.2 Provider 配置
-
-```typescript
-// 支持的 Provider
-const providers = {
-  copilot: {
-    auth: 'oauth',  // 用户各自的 OAuth token
-    models: ['gpt-4o', 'gpt-4o-mini']
+  "organization": {
+    "name": "XXX 技术团队",
+    "adminUsers": ["user-id-1"]
   },
-  openai: {
-    apiKey: 'org-xxx',  // 企业 API Key
-    models: ['gpt-4o', 'gpt-4o-mini']
-  }
-};
-```
-
-### 5.3 与企业 AI 账号对接
-
-**GitHub Copilot OAuth 流程**：
-
-```
-用户授权 Copilot
-    ↓
-获取用户 Access Token
-    ↓
-Token 存入用户会话/Redis
-    ↓
-AI 请求时携带 Token 调用 Copilot API
+  "visibleAgents": ["agent-id-1", "agent-id-2"],
+  "publicSkills": ["skill-id-1"]
+}
 ```
 
 ---
 
-## 6. 部署方案
+## 9. 后续扩展
 
-### 6.1 Docker Compose
-
-```yaml
-version: '3.8'
-
-services:
-  # Vue 前端
-  frontend:
-    build: ./frontend
-    ports:
-      - "80:80"
-    depends_on:
-      - backend
-
-  # Java 后端
-  backend:
-    build: ./backend
-    ports:
-      - "8080:8080"
-    environment:
-      - DB_HOST=postgres
-      - DB_PORT=5432
-      - REDIS_HOST=redis
-      - AI_SERVICE_URL=http://ai-service:3000
-    depends_on:
-      - postgres
-      - redis
-      - ai-service
-
-  # Node.js AI Service
-  ai-service:
-    build: ./ai-service
-    ports:
-      - "3000:3000"
-    environment:
-      - NODE_ENV=production
-    volumes:
-      - ./ai-service/config:/app/config
-
-  # PostgreSQL
-  postgres:
-    image: pgvector/pgvector:pg16
-    environment:
-      - POSTGRES_DB=ai_agent_workbench
-      - POSTGRES_USER=xxx
-      - POSTGRES_PASSWORD=xxx
-    volumes:
-      - postgres_data:/var/lib/postgresql/data
-
-  # Redis (可选)
-  redis:
-    image: redis:7-alpine
-    volumes:
-      - redis_data:/data
-
-volumes:
-  postgres_data:
-  redis_data:
-```
-
-### 6.2 环境变量
-
-**Java 后端**：
-
-| 变量 | 说明 | 示例 |
-|------|------|------|
-| DB_HOST | 数据库地址 | postgres |
-| DB_PORT | 数据库端口 | 5432 |
-| DB_NAME | 数据库名 | ai_agent_workbench |
-| DB_USER | 数据库用户 | xxx |
-| DB_PASSWORD | 数据库密码 | xxx |
-| AI_SERVICE_URL | AI Service 地址 | http://ai-service:3000 |
-| JWT_SECRET | JWT 密钥 | xxx |
-| SSO_AZURE_CLIENT_ID | Azure AD 应用ID | xxx |
-| SSO_AZURE_CLIENT_SECRET | Azure AD 密钥 | xxx |
-| SSO_AZURE_TENANT_ID | Azure AD 租户ID | xxx |
-
-**Node.js AI Service**：
-
-| 变量 | 说明 | 示例 |
-|------|------|------|
-| NODE_ENV | 环境 | production |
-| OPENAI_API_KEY | OpenAI API Key | sk-xxx |
-| COPILOT_CLIENT_ID | Copilot Client ID | xxx |
-| COPILOT_CLIENT_SECRET | Copilot Client Secret | xxx |
-
----
-
-## 7. 安全考虑
-
-- JWT Token 认证，过期自动刷新
-- 数据库密码加密存储
-- AI Provider API Keys 不暴露给前端
-- CORS 配置限制
-- 输入验证（防止注入）
-- 敏感操作日志记录
-
----
-
-## 8. 后续扩展
-
-- [ ] SSO 集成（Microsoft Entra ID）
-- [ ] Jira 集成（创建工单、同步状态）
-- [ ] 知识库功能（向量检索）
+- [ ] 企业 SSO 登录（Microsoft Entra ID）
+- [ ] 后端服务（用户管理、权限控制、数据同步）
+- [ ] Jira 集成
 - [ ] 使用统计与审计
-- [ ] Slack/飞书通知集成
-
----
-
-## 9. TODO
-
-- [ ] 编写详细 API 文档
-- [ ] 设计 Agent 配置 UI
-- [ ] 实现 SSO 集成
-- [ ] 编写部署文档
