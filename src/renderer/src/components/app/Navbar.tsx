@@ -7,6 +7,7 @@ import type { FC, PropsWithChildren } from 'react'
 import type { HTMLAttributes } from 'react'
 import styled from 'styled-components'
 
+import { UserSwitcher } from '../common/UserSwitcher'
 import WindowControls from '../WindowControls'
 
 type Props = PropsWithChildren & HTMLAttributes<HTMLDivElement>
@@ -40,8 +41,10 @@ export const NavbarCenter: FC<Props> = ({ children, ...props }) => {
 export const NavbarRight: FC<Props> = ({ children, ...props }) => {
   const isFullscreen = useFullscreen()
   return (
-    <NavbarRightContainer {...props} $isFullscreen={isFullscreen}>
+    <NavbarRightContainer {...props} $isfullscreen={isFullscreen}>
+      <UserSwitcher />
       {children}
+      <WindowControls />
     </NavbarRightContainer>
   )
 }
