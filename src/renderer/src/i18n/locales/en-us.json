@@ -1,4 +1,9 @@
 {
+  "admin": {
+    "agents": "Public Agents",
+    "skills": "Public Skills",
+    "users": "User Management"
+  },
   "agent": {
     "add": {
       "description": "Handle complex tasks with various tools",
@@ -4277,6 +4282,7 @@
         "title": "Navbar Settings"
       },
       "sidebar": {
+        "admin": "Admin",
         "chat": {
           "hiddenMessage": "Assistants are basic functions, not supported for hiding"
         },

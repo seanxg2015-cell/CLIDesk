@@ -1,4 +1,9 @@
 {
+  "admin": {
+    "agents": "公共 Agent",
+    "skills": "公共 Skill",
+    "users": "用户管理"
+  },
   "agent": {
     "add": {
       "description": "调用各种工具处理复杂任务",
@@ -4277,6 +4282,7 @@
         "title": "导航栏设置"
       },
       "sidebar": {
+        "admin": "管理后台",
         "chat": {
           "hiddenMessage": "助手是基础功能，不支持隐藏"
         },

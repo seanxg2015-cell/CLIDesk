@@ -37,6 +37,7 @@ import styled from 'styled-components'
 import { OpenClawSidebarIcon } from '../Icons/SVGIcon'
 import UserPopup from '../Popups/UserPopup'
 import { SidebarOpenedMinappTabs, SidebarPinnedApps } from './PinnedMinapps'
+import { Shield } from 'lucide-react'
 
 const Sidebar: FC = () => {
   const { hideMinappPopup } = useMinappPopup()
@@ -121,7 +122,7 @@ const Sidebar: FC = () => {
 const MainMenus: FC = () => {
   const { hideMinappPopup } = useMinappPopup()
   const { pathname } = useLocation()
-  const { sidebarIcons, defaultPaintingProvider } = useSettings()
+  const { sidebarIcons, defaultPaintingProvider, isAdmin } = useSettings()
   const { minappShow } = useRuntime()
   const navigate = useNavigate()
   const { theme } = useTheme()
@@ -140,7 +141,8 @@ const MainMenus: FC = () => {
     files: <Folder size={18} className="icon" />,
     notes: <NotepadText size={18} className="icon" />,
     code_tools: <Code size={18} className="icon" />,
-    openclaw: <OpenClawSidebarIcon style={{ width: 18, height: 18 }} className="icon" />
+    openclaw: <OpenClawSidebarIcon style={{ width: 18, height: 18 }} className="icon" />,
+    admin: <Shield size={18} className="icon" />
   }
 
   const pathMap = {
@@ -154,10 +156,13 @@ const MainMenus: FC = () => {
     files: '/files',
     code_tools: '/code',
     notes: '/notes',
-    openclaw: '/openclaw'
+    openclaw: '/openclaw',
+    admin: '/admin'
   }
 
-  return sidebarIcons.visible.map((icon) => {
+  const visibleIcons = sidebarIcons.visible.concat(isAdmin ? ['admin'] : [])
+
+  return visibleIcons.map((icon) => {
     const path = pathMap[icon]
     const isActive = path === '/' ? isRoute(path) : isRoutes(path)
 

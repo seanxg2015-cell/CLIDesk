@@ -23,6 +23,10 @@ import PaintingsRoutePage from './pages/paintings/PaintingsRoutePage'
 import SettingsPage from './pages/settings/SettingsPage'
 import AssistantPresetsPage from './pages/store/assistants/presets/AssistantPresetsPage'
 import TranslatePage from './pages/translate/TranslatePage'
+import AdminLayout from './pages/admin/AdminLayout'
+import AdminAgentsPage from './pages/admin/AdminAgentsPage'
+import AdminSkillsPage from './pages/admin/AdminSkillsPage'
+import AdminUsersPage from './pages/admin/AdminUsersPage'
 
 const Router: FC = () => {
   const { navbarPosition } = useNavbarPosition()
@@ -45,6 +49,11 @@ const Router: FC = () => {
           <Route path="/openclaw" element={<OpenClawPage />} />
           <Route path="/settings/*" element={<SettingsPage />} />
           <Route path="/launchpad" element={<LaunchpadPage />} />
+          <Route path="/admin" element={<AdminLayout />}>
+            <Route path="agents" element={<AdminAgentsPage />} />
+            <Route path="skills" element={<AdminSkillsPage />} />
+            <Route path="users" element={<AdminUsersPage />} />
+          </Route>
         </Routes>
       </ErrorBoundary>
     )
