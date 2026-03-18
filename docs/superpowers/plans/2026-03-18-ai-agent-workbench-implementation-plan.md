@@ -410,6 +410,7 @@ import { AgentForm } from './AgentForm';
 export const AdminAgentSettings = () => {
   const [formOpen, setFormOpen] = useState(false);
   const [editingAgent, setEditingAgent] = useState<any>(null);
+  const [refreshKey, setRefreshKey] = useState(0);
 
   const handleSave = async (values: any) => {
     if (editingAgent) {
@@ -419,7 +420,7 @@ export const AdminAgentSettings = () => {
     }
     setFormOpen(false);
     setEditingAgent(null);
-    // 刷新列表
+    setRefreshKey(k => k + 1); // 触发列表刷新
   };
 
   const handleEdit = (agent: any) => {
@@ -430,7 +431,7 @@ export const AdminAgentSettings = () => {
   return (
     <div>
       <h2>公共 Agent 管理</h2>
-      <AgentList onEdit={handleEdit} />
+      <AgentList onEdit={handleEdit} refreshKey={refreshKey} />
       <AgentForm 
         open={formOpen} 
         onClose={() => { setFormOpen(false); setEditingAgent(null); }} 
@@ -442,17 +443,21 @@ export const AdminAgentSettings = () => {
 };
 ```
 
-同时更新 AgentList，添加 onEdit 回调：
+同时更新 AgentList，添加 refreshKey 和 onEdit 回调：
 
 ```tsx
 // AgentList.tsx
 interface Props {
   onEdit: (agent: Agent) => void;
+  refreshKey?: number;
 }
 
-// 在 columns 中:
-<Button size="small" onClick={() => onEdit(record)}>编辑</Button>
-```
+export const AgentList = ({ onEdit, refreshKey }: Props) => {
+  // ... useEffect 添加 refreshKey 依赖:
+  useEffect(() => {
+    window.api.invoke('agent:list').then(setAgents).finally(() => setLoading(false));
+  }, [refreshKey]);
+};
 
 - [ ] **Step 4: 在路由中注册**
 
@@ -695,11 +700,29 @@ export class SkillService {
 export const skillService = new SkillService();
 ```
 
+- [ ] **Step 3: 在 main process 注册 IPC handlers**
+
+查看 Cherry Studio 中现有的 IPC handlers 注册位置（通常在 `src/main/` 目录下），添加：
+
+```typescript
+// 在相应的 handlers 文件中添加:
+import { skillService } from './services/agent-workbench/SkillService';
+
+ipcMain.handle('skill:listAll', async () => skillService.listAllSkills());
+ipcMain.handle('skill:listPublic', async () => skillService.listPublicSkills());
+ipcMain.handle('skill:listUser', async (_, userId: string) => skillService.listUserSkills(userId));
+ipcMain.handle('skill:getUserSelected', async (_, userId: string) => skillService.getUserSelectedSkills(userId));
+ipcMain.handle('skill:setUserSelected', async (_, userId: string, skillIds: string[]) => skillService.setUserSelectedSkills(userId, skillIds));
+ipcMain.handle('skill:create', async (_, data) => skillService.createSkill(data));
+ipcMain.handle('skill:update', async (_, id, data) => skillService.updateSkill(id, data));
+ipcMain.handle('skill:delete', async (_, id) => skillService.deleteSkill(id));
+```
+
 - [ ] **Step 4: 提交**
 
 ```bash
-git add src/main/apiServer/routes/skills.ts src/main/apiServer/index.ts src/main/services/agent-workbench/SkillService.ts
-git commit -m "feat: add skill API routes"
+git add src/main/services/agent-workbench/SkillService.ts
+git commit -m "feat: add SkillService"
 ```
 
 ---
@@ -807,7 +830,7 @@ export const SkillForm = ({ open, onClose, onSave, initialValues }: Props) => {
             </Form.Item>
           </Space>
         </Form.Item>
-        <Form.Item name="instruction" label="指令" rules={[{ required: true }]}>
+        <Form.Item name="instruction" label="指令" rules={[{ required: true, message: '请输入指令' }]}>
           <Input.TextArea rows={4} placeholder="你是一个专业的代码审查助手..." />
         </Form.Item>
         <Form.Item name="steps" label="执行步骤">
@@ -1106,6 +1129,7 @@ git commit -m "feat: integrate skill context injection"
 - [ ] 用户切换功能正常
 - [ ] 管理员可见管理后台入口
 - [ ] 非管理员不可见管理后台入口
+- [ ] 非管理员访问 `/admin/*` 被重定向
 - [ ] 创建/编辑/删除 Agent
 - [ ] 创建/编辑/删除公共 Skill
 - [ ] Skill 市场显示所有可用 Skill
