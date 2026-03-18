@@ -393,6 +393,16 @@ export const AgentForm = ({ open, onClose, onSave, initialValues }: Props) => {
         <Form.Item name="model" label="默认模型">
           <Select options={[]} />
         </Form.Item>
+        <Form.Item name="temperature" label="温度" tooltip="控制输出的随机性，较低值更确定性">
+          <InputNumber min={0} max={2} step={0.1} defaultValue={0.7} />
+        </Form.Item>
+        <Form.Item name="tools" label="工具" tooltip="Agent 可使用的工具">
+          <Select mode="multiple" options={[
+            { label: '网络搜索', value: 'web-search' },
+            { label: '代码执行', value: 'code-executor' },
+            { label: '文件读取', value: 'file-reader' },
+          ]} />
+        </Form.Item>
       </Form>
     </Modal>
   );
@@ -700,6 +710,13 @@ export class SkillService {
 export const skillService = new SkillService();
 ```
 
+- [ ] **Step 2: 提交 SkillService**
+
+```bash
+git add src/main/services/agent-workbench/SkillService.ts
+git commit -m "feat: add SkillService"
+```
+
 - [ ] **Step 3: 在 main process 注册 IPC handlers**
 
 查看 Cherry Studio 中现有的 IPC handlers 注册位置（通常在 `src/main/` 目录下），添加：
@@ -722,7 +739,8 @@ ipcMain.handle('skill:delete', async (_, id) => skillService.deleteSkill(id));
 
 ```bash
 git add src/main/services/agent-workbench/SkillService.ts
-git commit -m "feat: add SkillService"
+# 确保 IPC handlers 也被添加到正确的文件中
+git commit -m "feat: add skill IPC handlers"
 ```
 
 ---
