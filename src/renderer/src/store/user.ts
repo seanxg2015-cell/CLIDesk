@@ -1,4 +1,5 @@
 import { createSlice, PayloadAction } from '@reduxjs/toolkit'
+import { nanoid } from '@reduxjs/toolkit'
 
 export interface LocalUser {
   id: string

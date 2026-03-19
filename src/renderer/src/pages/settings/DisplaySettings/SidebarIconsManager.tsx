@@ -17,9 +17,7 @@ import {
   MousePointerClick,
   NotepadText,
   Palette,
-  Shield,
-  Sparkle,
-  Zap
+  Sparkle
 } from 'lucide-react'
 import type { FC, ReactNode } from 'react'
 import { useCallback, useMemo } from 'react'
@@ -129,9 +127,7 @@ const SidebarIconsManager: FC<SidebarIconsManagerProps> = ({
         files: <Folder size={16} />,
         notes: <NotepadText size={16} />,
         code_tools: <Code size={16} />,
-        openclaw: <OpenClawSidebarIcon style={{ width: 16, height: 16 }} />,
-        admin: <Shield size={16} />,
-        'skill-market': <Zap size={16} />
+        openclaw: <OpenClawSidebarIcon style={{ width: 16, height: 16 }} />
       }) satisfies Record<SidebarIcon, ReactNode>,
     []
   )

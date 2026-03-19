@@ -70,7 +70,6 @@ export const AgentBaseSchema = z.object({
   // Basic info
   name: z.string().optional(),
   description: z.string().optional(),
-  avatar: z.string().optional(), // Emoji or icon for the agent
   accessible_paths: z.array(z.string()), // Array of directory paths the agent can access (empty = use default workspace)
 
   // Instructions for the agent
@@ -87,11 +86,7 @@ export const AgentBaseSchema = z.object({
   slash_commands: z.array(SlashCommandSchema).optional(), // Array of slash commands merged from builtin and SDK
 
   // Configuration
-  configuration: AgentConfigurationSchema.optional(), // Extensible settings like temperature, top_p, etc.
-
-  // Admin fields
-  is_public: z.boolean().optional(), // Public agent visible to all users
-  is_active: z.boolean().optional() // Agent enabled/disabled
+  configuration: AgentConfigurationSchema.optional() // Extensible settings like temperature, top_p, etc.
 })
 
 export type AgentBase = z.infer<typeof AgentBaseSchema>
