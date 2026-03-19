@@ -1,6 +1,5 @@
 import { loggerService } from '@logger'
 import { isLinux, isMac, isWin } from '@main/constant'
-import ElectronShutdownHandler from '@paymoapp/electron-shutdown-handler'
 import { BrowserWindow } from 'electron'
 import { powerMonitor } from 'electron'
 
@@ -71,6 +70,13 @@ export class PowerMonitorService {
    */
   private initWindowsShutdownHandler(): void {
     try {
+      let ElectronShutdownHandler
+      try {
+        ElectronShutdownHandler = require('@paymoapp/electron-shutdown-handler')
+      } catch {
+        logger.warn('Windows shutdown handler not available, skipping')
+        return
+      }
       const zeroMemoryWindow = new BrowserWindow({ show: false })
       // Set the window handle for the shutdown handler
       ElectronShutdownHandler.setWindowHandle(zeroMemoryWindow.getNativeWindowHandle())
