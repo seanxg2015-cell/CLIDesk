@@ -10,6 +10,9 @@ import TabsContainer from './components/Tab/TabContainer'
 import NavigationHandler from './handler/NavigationHandler'
 import { useNavbarPosition } from './hooks/useSettings'
 import AgentPage from './pages/agents/AgentPage'
+import AdminAgentsPage from './pages/admin/AdminAgentsPage'
+import AdminLayout from './pages/admin/AdminLayout'
+import AdminSkillsPage from './pages/admin/AdminSkillsPage'
 import CodeToolsPage from './pages/code/CodeToolsPage'
 import FilesPage from './pages/files/FilesPage'
 import HomePage from './pages/home/HomePage'
@@ -21,6 +24,7 @@ import NotesPage from './pages/notes/NotesPage'
 import OpenClawPage from './pages/openclaw/OpenClawPage'
 import PaintingsRoutePage from './pages/paintings/PaintingsRoutePage'
 import SettingsPage from './pages/settings/SettingsPage'
+import SkillMarketPage from './pages/skill-market/SkillMarketPage'
 import AssistantPresetsPage from './pages/store/assistants/presets/AssistantPresetsPage'
 import TranslatePage from './pages/translate/TranslatePage'
 
@@ -45,6 +49,11 @@ const Router: FC = () => {
           <Route path="/openclaw" element={<OpenClawPage />} />
           <Route path="/settings/*" element={<SettingsPage />} />
           <Route path="/launchpad" element={<LaunchpadPage />} />
+          <Route path="/skill-market" element={<SkillMarketPage />} />
+          <Route path="/admin/*" element={<AdminLayout />}>
+            <Route path="agents" element={<AdminAgentsPage />} />
+            <Route path="skills" element={<AdminSkillsPage />} />
+          </Route>
         </Routes>
       </ErrorBoundary>
     )

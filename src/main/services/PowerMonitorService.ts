@@ -1,7 +1,5 @@
 import { loggerService } from '@logger'
 import { isLinux, isMac, isWin } from '@main/constant'
-import ElectronShutdownHandler from '@paymoapp/electron-shutdown-handler'
-import { BrowserWindow } from 'electron'
 import { powerMonitor } from 'electron'
 
 const logger = loggerService.withContext('PowerMonitorService')
@@ -67,23 +65,16 @@ export class PowerMonitorService {
   }
 
   /**
-   * Initialize shutdown handler for Windows using @paymoapp/electron-shutdown-handler
+   * Initialize shutdown handler for Windows
+   * Uses Electron powerMonitor instead of native module (avoids build issues)
    */
   private initWindowsShutdownHandler(): void {
     try {
-      const zeroMemoryWindow = new BrowserWindow({ show: false })
-      // Set the window handle for the shutdown handler
-      ElectronShutdownHandler.setWindowHandle(zeroMemoryWindow.getNativeWindowHandle())
-
-      // Listen for shutdown event
-      ElectronShutdownHandler.on('shutdown', async () => {
+      logger.info('Using Electron powerMonitor for Windows shutdown handling')
+      powerMonitor.on('shutdown', async () => {
         logger.info('System shutdown event detected (Windows)')
-        // Execute all registered shutdown handlers
         await this.executeShutdownHandlers()
-        // Release the shutdown block to allow the system to shut down
-        ElectronShutdownHandler.releaseShutdown()
       })
-
       logger.info('Windows shutdown handler registered')
     } catch (error) {
       logger.error('Failed to initialize Windows shutdown handler', error as Error)
@@ -97,7 +88,6 @@ export class PowerMonitorService {
     try {
       powerMonitor.on('shutdown', async () => {
         logger.info('System shutdown event detected', { platform: process.platform })
-        // Execute all registered shutdown handlers
         await this.executeShutdownHandlers()
       })
 

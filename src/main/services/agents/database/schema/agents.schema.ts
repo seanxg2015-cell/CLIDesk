@@ -9,6 +9,7 @@ export const agentsTable = sqliteTable('agents', {
   type: text('type').notNull(),
   name: text('name').notNull(),
   description: text('description'),
+  avatar: text('avatar'), // Emoji or icon for the agent
   accessible_paths: text('accessible_paths'), // JSON array of directory paths the agent can access
 
   instructions: text('instructions'),
@@ -21,6 +22,9 @@ export const agentsTable = sqliteTable('agents', {
   allowed_tools: text('allowed_tools'), // JSON array of allowed tool IDs (whitelist)
 
   configuration: text('configuration'), // JSON, extensible settings
+
+  is_public: integer('is_public', { mode: 'boolean' }).default(false), // Public agent visible to all users
+  is_active: integer('is_active', { mode: 'boolean' }).default(true), // Agent enabled/disabled
 
   sort_order: integer('sort_order').notNull().default(0), // Manual sort order (lower = first)
 

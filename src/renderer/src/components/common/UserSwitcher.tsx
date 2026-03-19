@@ -1,7 +1,7 @@
 import { Avatar, Dropdown, Input, message, Space, Tag, Typography } from 'antd'
 import { UserOutlined, PlusOutlined, CheckOutlined } from '@ant-design/icons'
 import { useAppDispatch, useAppSelector } from '@renderer/store'
-import { addUser, removeUser, switchUser } from '@renderer/store/user'
+import { addUser, switchUser } from '@renderer/store/user'
 import { useState } from 'react'
 import { nanoid } from '@reduxjs/toolkit'
 
@@ -37,12 +37,6 @@ export const UserSwitcher = () => {
     dispatch(switchUser(userId))
     const user = users.find((u) => u.id === userId)
     message.success(`已切换到: ${user?.name}`)
-  }
-
-  const handleRemoveUser = (userId: string) => {
-    const user = users.find((u) => u.id === userId)
-    dispatch(removeUser(userId))
-    message.success(`已删除用户: ${user?.name}`)
   }
 
   const menuItems = [

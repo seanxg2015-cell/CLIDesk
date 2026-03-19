@@ -1,9 +1,20 @@
 import { useCallback, useEffect, useState } from 'react'
 import { useTranslation } from 'react-i18next'
 import { Button, Card, Modal, Popconfirm, Space, Switch, Table, Typography, message } from 'antd'
-import type { AgentEntity } from '@types'
 
 const { Title, Paragraph } = Typography
+
+interface AgentEntity {
+  id: string
+  name?: string
+  description?: string
+  avatar?: string
+  instructions?: string
+  model: string
+  is_public?: boolean
+  is_active?: boolean
+  [key: string]: any
+}
 
 interface AgentFormData {
   id?: string

@@ -5651,5 +5651,22 @@
     "quit": "結束",
     "show_window": "顯示視窗",
     "visualization": "視覺化"
+  },
+  "admin": {
+    "title": "管理後台",
+    "agents": {
+      "title": "智慧體"
+    },
+    "skills": {
+      "title": "技能"
+    },
+    "users": {
+      "title": "用戶"
+    }
+  },
+  "skill": {
+    "market": {
+      "title": "技能市場"
+    }
   }
 }

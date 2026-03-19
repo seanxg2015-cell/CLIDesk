@@ -698,6 +698,26 @@ const api = {
   },
   analytics: {
     trackTokenUsage: (data: TokenUsageData) => ipcRenderer.invoke(IpcChannel.Analytics_TrackTokenUsage, data)
+  },
+  agentAdmin: {
+    listPublic: () => ipcRenderer.invoke(IpcChannel.AgentAdmin_ListPublic),
+    create: (data: any) => ipcRenderer.invoke(IpcChannel.AgentAdmin_Create, data),
+    update: (id: string, updates: any) => ipcRenderer.invoke(IpcChannel.AgentAdmin_Update, id, updates),
+    delete: (id: string) => ipcRenderer.invoke(IpcChannel.AgentAdmin_Delete, id)
+  },
+  skillAdmin: {
+    listPublic: () => ipcRenderer.invoke(IpcChannel.SkillAdmin_ListPublic),
+    create: (data: any) => ipcRenderer.invoke(IpcChannel.SkillAdmin_Create, data),
+    update: (id: string, updates: any) => ipcRenderer.invoke(IpcChannel.SkillAdmin_Update, id, updates),
+    delete: (id: string) => ipcRenderer.invoke(IpcChannel.SkillAdmin_Delete, id)
+  },
+  skillUser: {
+    listSelected: (userId: string) => ipcRenderer.invoke(IpcChannel.SkillUser_ListSelected, userId),
+    select: (userId: string, skillId: string) => ipcRenderer.invoke(IpcChannel.SkillUser_Select, userId, skillId),
+    deselect: (userId: string, skillId: string) => ipcRenderer.invoke(IpcChannel.SkillUser_Deselect, userId, skillId),
+    toggle: (userId: string, skillId: string, enabled: boolean) =>
+      ipcRenderer.invoke(IpcChannel.SkillUser_Toggle, userId, skillId, enabled),
+    getInstructions: (userId: string) => ipcRenderer.invoke(IpcChannel.SkillUser_GetInstructions, userId)
   }
 }
 

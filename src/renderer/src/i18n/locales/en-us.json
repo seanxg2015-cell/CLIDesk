@@ -5651,5 +5651,22 @@
     "quit": "Quit",
     "show_window": "Show Window",
     "visualization": "Visualization"
+  },
+  "admin": {
+    "title": "Admin",
+    "agents": {
+      "title": "Agents"
+    },
+    "skills": {
+      "title": "Skills"
+    },
+    "users": {
+      "title": "Users"
+    }
+  },
+  "skill": {
+    "market": {
+      "title": "Skill Market"
+    }
   }
 }

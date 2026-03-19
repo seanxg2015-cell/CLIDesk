@@ -26,6 +26,7 @@ import {
   NotepadText,
   Palette,
   Settings,
+  Shield,
   Sparkle,
   Sun
 } from 'lucide-react'
@@ -140,7 +141,9 @@ const MainMenus: FC = () => {
     files: <Folder size={18} className="icon" />,
     notes: <NotepadText size={18} className="icon" />,
     code_tools: <Code size={18} className="icon" />,
-    openclaw: <OpenClawSidebarIcon style={{ width: 18, height: 18 }} className="icon" />
+    openclaw: <OpenClawSidebarIcon style={{ width: 18, height: 18 }} className="icon" />,
+    admin: <Shield size={18} className="icon" />,
+    'skill-market': <Sparkle size={18} className="icon" />
   }
 
   const pathMap = {
@@ -154,7 +157,9 @@ const MainMenus: FC = () => {
     files: '/files',
     code_tools: '/code',
     notes: '/notes',
-    openclaw: '/openclaw'
+    openclaw: '/openclaw',
+    admin: '/admin/agents',
+    'skill-market': '/skill-market'
   }
 
   return sidebarIcons.visible.map((icon) => {

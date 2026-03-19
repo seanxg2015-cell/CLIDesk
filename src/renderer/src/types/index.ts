@@ -667,6 +667,8 @@ export type SidebarIcon =
   | 'code_tools'
   | 'notes'
   | 'openclaw'
+  | 'admin'
+  | 'skill-market'
 
 export type ExternalToolResult = {
   mcpTools?: MCPTool[]

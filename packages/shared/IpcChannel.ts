@@ -112,6 +112,25 @@ export enum IpcChannel {
   AgentToolPermission_Response = 'agent-tool-permission:response',
   AgentToolPermission_Result = 'agent-tool-permission:result',
 
+  // Agent Admin (for team management)
+  AgentAdmin_ListPublic = 'agent-admin:list-public',
+  AgentAdmin_Create = 'agent-admin:create',
+  AgentAdmin_Update = 'agent-admin:update',
+  AgentAdmin_Delete = 'agent-admin:delete',
+
+  // Skill Admin (for team skill management)
+  SkillAdmin_ListPublic = 'skill-admin:list-public',
+  SkillAdmin_Create = 'skill-admin:create',
+  SkillAdmin_Update = 'skill-admin:update',
+  SkillAdmin_Delete = 'skill-admin:delete',
+
+  // Skill User (for user skill selection)
+  SkillUser_ListSelected = 'skill-user:list-selected',
+  SkillUser_Select = 'skill-user:select',
+  SkillUser_Deselect = 'skill-user:deselect',
+  SkillUser_Toggle = 'skill-user:toggle',
+  SkillUser_GetInstructions = 'skill-user:get-instructions',
+
   //copilot
   Copilot_GetAuthMessage = 'copilot:get-auth-message',
   Copilot_GetCopilotToken = 'copilot:get-copilot-token',
