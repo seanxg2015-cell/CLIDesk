@@ -39,7 +39,6 @@ import { BrowserWindow, dialog, ipcMain, session, shell, systemPreferences, webC
 import fontList from 'font-list'
 
 import { agentMessageRepository } from './services/agents/database'
-import { agentService } from './services/agents/services'
 import { PluginService } from './services/agents/plugins/PluginService'
 import { analyticsService } from './services/AnalyticsService'
 import { apiServerService } from './services/ApiServerService'
@@ -282,6 +281,7 @@ export async function registerIpc(mainWindow: BrowserWindow, app: Electron.App) 
   // Agent Admin handlers
   ipcMain.handle(IpcChannel.AgentAdmin_ListPublic, async () => {
     try {
+      const { agentService } = await import('./services/agents/services')
       const database = await agentService.getDatabase()
       const { eq } = await import('drizzle-orm')
       const { agentsTable } = await import('@main/services/agents/database/schema')
@@ -294,6 +294,7 @@ export async function registerIpc(mainWindow: BrowserWindow, app: Electron.App) 
 
   ipcMain.handle(IpcChannel.AgentAdmin_Create, async (_event, data) => {
     try {
+      const { agentService } = await import('./services/agents/services')
       return await agentService.createAgent(data)
     } catch (error) {
       logger.error('Failed to create agent', error as Error)
@@ -303,6 +304,7 @@ export async function registerIpc(mainWindow: BrowserWindow, app: Electron.App) 
 
   ipcMain.handle(IpcChannel.AgentAdmin_Update, async (_event, id, updates) => {
     try {
+      const { agentService } = await import('./services/agents/services')
       const { eq } = await import('drizzle-orm')
       const { agentsTable } = await import('@main/services/agents/database/schema')
       const database = await agentService.getDatabase()
@@ -328,6 +330,7 @@ export async function registerIpc(mainWindow: BrowserWindow, app: Electron.App) 
 
   ipcMain.handle(IpcChannel.AgentAdmin_Delete, async (_event, id) => {
     try {
+      const { agentService } = await import('./services/agents/services')
       const { eq } = await import('drizzle-orm')
       const { agentsTable } = await import('@main/services/agents/database/schema')
       const database = await agentService.getDatabase()

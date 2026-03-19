@@ -66,30 +66,17 @@ export class PowerMonitorService {
   }
 
   /**
-   * Initialize shutdown handler for Windows using @paymoapp/electron-shutdown-handler
+   * Initialize shutdown handler for Windows
+   * Note: @paymoapp/electron-shutdown-handler native module requires Visual Studio build tools
+   * Using Electron's powerMonitor as fallback
    */
   private initWindowsShutdownHandler(): void {
     try {
-      let ElectronShutdownHandler
-      try {
-        ElectronShutdownHandler = require('@paymoapp/electron-shutdown-handler')
-      } catch {
-        logger.warn('Windows shutdown handler not available, skipping')
-        return
-      }
-      const zeroMemoryWindow = new BrowserWindow({ show: false })
-      // Set the window handle for the shutdown handler
-      ElectronShutdownHandler.setWindowHandle(zeroMemoryWindow.getNativeWindowHandle())
-
-      // Listen for shutdown event
-      ElectronShutdownHandler.on('shutdown', async () => {
-        logger.info('System shutdown event detected (Windows)')
-        // Execute all registered shutdown handlers
+      logger.info('Using Electron powerMonitor for Windows shutdown handling')
+      powerMonitor.on('shutdown', async () => {
+        logger.info('System shutdown event detected (Windows via powerMonitor)')
         await this.executeShutdownHandlers()
-        // Release the shutdown block to allow the system to shut down
-        ElectronShutdownHandler.releaseShutdown()
       })
-
       logger.info('Windows shutdown handler registered')
     } catch (error) {
       logger.error('Failed to initialize Windows shutdown handler', error as Error)
