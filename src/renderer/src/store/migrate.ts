@@ -3368,6 +3368,25 @@ const migrateConfig = {
       logger.error('migrate 204 error', error as Error)
       return state
     }
+  },
+  '205': (state: RootState) => {
+    try {
+      if (state.settings && state.settings.sidebarIcons) {
+        // Add 'admin' to visible icons if not already present
+        if (!state.settings.sidebarIcons.visible.includes('admin')) {
+          state.settings.sidebarIcons.visible = [...state.settings.sidebarIcons.visible, 'admin']
+        }
+        // Add 'skill-market' to visible icons if not already present
+        if (!state.settings.sidebarIcons.visible.includes('skill-market')) {
+          state.settings.sidebarIcons.visible = [...state.settings.sidebarIcons.visible, 'skill-market']
+        }
+      }
+      logger.info('migrate 205 success')
+      return state
+    } catch (error) {
+      logger.error('migrate 205 error', error as Error)
+      return state
+    }
   }
 }
 

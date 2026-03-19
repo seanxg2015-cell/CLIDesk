@@ -6,7 +6,7 @@ export interface LocalUser {
   createdAt: string
 }
 
-interface UserState {
+export interface UserState {
   users: LocalUser[]
   currentUserId: string | null
 }
